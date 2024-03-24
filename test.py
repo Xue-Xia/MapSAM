@@ -9,10 +9,10 @@ import numpy as np
 import torch
 from torch.utils.data import DataLoader
 import torch.backends.cudnn as cudnn
-from utils import test_single_volume
+from utils_hm import test_single_volume
 from importlib import import_module
 from segment_anything import sam_model_registry
-from datasets.dataset_synapse import Synapse_dataset
+from datasets.dataset_hm import hm_dataset
 
 from icecream import ic
 
@@ -21,7 +21,7 @@ class_to_name = {1: 'spleen', 2: 'right kidney', 3: 'left kidney', 4: 'gallbladd
 
 
 def inference(args, multimask_output, db_config, model, test_save_path=None):
-    db_test = db_config['Dataset'](base_dir=args.volume_path, list_dir=args.list_dir, split='test_vol')
+    db_test = db_config['Dataset'](base_dir=args.volume_path, list_dir=args.list_dir, split='test')
     testloader = DataLoader(db_test, batch_size=1, shuffle=False, num_workers=1)
     logging.info(f'{len(testloader)} test iterations per epoch')
     model.eval()
@@ -63,7 +63,7 @@ if __name__ == '__main__':
     parser.add_argument('--config', type=str, default=None, help='The config file provided by the trained model')
     parser.add_argument('--volume_path', type=str, default='testset/test_vol_h5/')
     parser.add_argument('--dataset', type=str, default='Synapse', help='Experiment name')
-    parser.add_argument('--num_classes', type=int, default=8)
+    parser.add_argument('--num_classes', type=int, default=3)
     parser.add_argument('--list_dir', type=str, default='./lists/lists_Synapse/', help='list_dir')
     parser.add_argument('--output_dir', type=str, default='/output')
     parser.add_argument('--img_size', type=int, default=512, help='Input image size of the network')
@@ -100,7 +100,7 @@ if __name__ == '__main__':
     dataset_name = args.dataset
     dataset_config = {
         'Synapse': {
-            'Dataset': Synapse_dataset,
+            'Dataset': hm_dataset,
             'volume_path': args.volume_path,
             'list_dir': args.list_dir,
             'num_classes': args.num_classes,

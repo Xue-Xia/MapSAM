@@ -12,8 +12,8 @@ safetensors==0.3.1
 scipy==1.7.3
 SimpleITK==2.2.1
 tensorboardX==2.6
-torch==1.9.1+cu111
-torchvision==0.10.1+cu111
+torch==1.9.1
+torchvision==0.10.1
 tqdm==4.62.3
 ml-collections==0.1.1
 pycocotools==2.0.6

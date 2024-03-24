@@ -12,7 +12,7 @@ from icecream import ic
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--src_path', type=str,
-                   default='../data/Abdomen/RawData', help='download path for Synapse data')
+                   default='../data/train', help='download path for Synapse data')
 parser.add_argument('--dst_path', type=str,
                    default='../data/Synapse', help='root dir for data')
 parser.add_argument('--use_normalize', action='store_true', default=True,
@@ -119,11 +119,11 @@ def preprocess_valid_image(image_files: str, label_files: str) -> None:
 
 
 if __name__ == "__main__":
-    data_root = f"{args.src_path}/Training"
+    data_root = f"{args.src_path}"
 
     # String sort
     image_files = sorted(glob(f"{data_root}/img/*.nii.gz"))
     label_files = sorted(glob(f"{data_root}/label/*.nii.gz"))
 
-    # preprocess_train_image(image_files, label_files)
-    preprocess_valid_image(image_files, label_files)
+    preprocess_train_image(image_files, label_files)
+    # preprocess_valid_image(image_files, label_files)

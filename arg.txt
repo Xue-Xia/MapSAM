@@ -1,0 +1,26 @@
+python train.py --root_path data/dataset_hm/partial_10 --output result/ --warmup --AdamW --n_gpu 1 --batch_size 8 --max_epochs 200
+
+python test.py --is_savenii --volume_path data/dataset_hm --output_dir result/
+
+partial1
+Mean class 1 name spleen mean_dice 0.000000 mean_hd95 0.000000
+Mean class 2 name right kidney mean_dice 0.894586 mean_hd95 3.566158
+Mean class 3 name left kidney mean_dice 0.000000 mean_hd95 0.000000
+Testing performance in best val model: mean_dice : 0.298195 mean_hd95 : 1.188719
+Testing Finished!
+mIoU per class: [0, 0.8520212361114325, 0]
+
+full
+Mean class 1 name spleen mean_dice 0.000000 mean_hd95 0.000000
+Mean class 2 name right kidney mean_dice 0.937200 mean_hd95 2.613633
+Mean class 3 name left kidney mean_dice 0.000000 mean_hd95 0.000000
+Testing performance in best val model: mean_dice : 0.312400 mean_hd95 : 0.871211
+mIoU per class: [0, 0.9107268322811116, 0]
+
+partial10
+Mean class 1 name spleen mean_dice 0.000000 mean_hd95 0.000000
+Mean class 2 name right kidney mean_dice 0.922433 mean_hd95 3.186162
+Mean class 3 name left kidney mean_dice 0.000000 mean_hd95 0.000000
+Testing performance in best val model: mean_dice : 0.307478 mean_hd95 : 1.062054
+Testing Finished!
+mIoU per class: [0, 0.8937961395811642, 0]
