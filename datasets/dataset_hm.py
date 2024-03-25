@@ -63,7 +63,7 @@ class hm_dataset(Dataset):
         self.split = split
         # self.sample_list = open(os.path.join(list_dir, self.split+'.txt')).readlines()
         self.img_dir = os.path.join(base_dir, split)
-        self.label_dir = os.path.join(base_dir, 'anno_multiclass', split)
+        self.label_dir = os.path.join(base_dir, 'annotation', split)
         self.file_names = os.listdir(os.path.join(base_dir, split))
 
     def __len__(self):
@@ -75,6 +75,7 @@ class hm_dataset(Dataset):
         image = cv2.imread(img_path, cv2.IMREAD_UNCHANGED)
         label = cv2.imread(label_path, cv2.IMREAD_UNCHANGED)
         image = np.transpose(image, (2, 0, 1)) / 255.0  # c,h,w
+        label = label/255
 
         sample = {'image': image, 'label': label}
         if self.transform:

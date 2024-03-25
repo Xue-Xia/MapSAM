@@ -1,14 +1,11 @@
-python train.py --root_path data/dataset_hm/partial_10 --output result/ --warmup --AdamW --n_gpu 1 --batch_size 8 --max_epochs 200
+python train.py --root_path data/dataset_hm/partial_1 --output result/ --warmup --AdamW --n_gpu 1 --batch_size 8 --max_epochs 200 --num_classes 1
 
-python test.py --is_savenii --volume_path data/dataset_hm --output_dir result/
+python test.py --is_savenii --volume_path data/dataset_hm --output_dir result/ --num_classes 1 --lora_ckpt checkpoints/epoch_159.pth
 
 partial1
-Mean class 1 name spleen mean_dice 0.000000 mean_hd95 0.000000
-Mean class 2 name right kidney mean_dice 0.894586 mean_hd95 3.566158
-Mean class 3 name left kidney mean_dice 0.000000 mean_hd95 0.000000
-Testing performance in best val model: mean_dice : 0.298195 mean_hd95 : 1.188719
+Testing performance in best val model: mean_dice : 0.917539 mean_hd95 : 6.191715
 Testing Finished!
-mIoU per class: [0, 0.8520212361114325, 0]
+mIoU: 0.8601029112604454
 
 full
 Mean class 1 name spleen mean_dice 0.000000 mean_hd95 0.000000

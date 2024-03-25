@@ -29,11 +29,11 @@ def calculate_iou_per_class(pred_mask, gt_mask, num_classes):
     return iou_per_class
 
 
-folder_path = "result/predictions_partial10"
+folder_path = "result/predictions_partial1"
 files = os.listdir(folder_path)
-num_classes = 3
-total_iou_per_class = [0] * num_classes
-count_per_class = [0] * num_classes
+# num_classes = 3
+# total_iou_per_class = [0] * num_classes
+# count_per_class = [0] * num_classes
 
 
 iou_values = []
@@ -46,18 +46,26 @@ for file_name in files:
         gt_mask = read_nifti(gt_file_path)
         pred_mask = read_nifti(pred_file_path)
 
-        # Compute IoU per class
-        iou_per_class = calculate_iou_per_class(pred_mask, gt_mask, num_classes)
+        # Calculate IoU for this pair of masks
+        iou = calculate_iou(gt_mask, pred_mask)
+        iou_values.append(iou)
 
-        # Update total IoU and count for each class where it appears
-        for class_id in range(num_classes):
-            if iou_per_class[class_id] > 0:
-                total_iou_per_class[class_id] += iou_per_class[class_id]
-                count_per_class[class_id] += 1
+# Calculate average IoU
+avg_iou = np.mean(iou_values)
+print("mIoU:", avg_iou)
 
-# Calculate mean IoU (mIoU) for each class
-miou_per_class = [total_iou_per_class[i] / count_per_class[i] if count_per_class[i] > 0 else 0 for i in
-                  range(num_classes)]
-
-print(total_iou_per_class, count_per_class)
-print("mIoU per class:", miou_per_class)
+#         # Compute IoU per class
+#         iou_per_class = calculate_iou_per_class(pred_mask, gt_mask, num_classes)
+#
+#         # Update total IoU and count for each class where it appears
+#         for class_id in range(num_classes):
+#             if iou_per_class[class_id] > 0:
+#                 total_iou_per_class[class_id] += iou_per_class[class_id]
+#                 count_per_class[class_id] += 1
+#
+# # Calculate mean IoU (mIoU) for each class
+# miou_per_class = [total_iou_per_class[i] / count_per_class[i] if count_per_class[i] > 0 else 0 for i in
+#                   range(num_classes)]
+#
+# print(total_iou_per_class, count_per_class)
+# print("mIoU per class:", miou_per_class)
