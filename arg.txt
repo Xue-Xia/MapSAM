@@ -7,17 +7,13 @@ Testing performance in best val model: mean_dice : 0.917539 mean_hd95 : 6.191715
 Testing Finished!
 mIoU: 0.8601029112604454
 
-full
-Mean class 1 name spleen mean_dice 0.000000 mean_hd95 0.000000
-Mean class 2 name right kidney mean_dice 0.937200 mean_hd95 2.613633
-Mean class 3 name left kidney mean_dice 0.000000 mean_hd95 0.000000
-Testing performance in best val model: mean_dice : 0.312400 mean_hd95 : 0.871211
-mIoU per class: [0, 0.9107268322811116, 0]
-
 partial10
-Mean class 1 name spleen mean_dice 0.000000 mean_hd95 0.000000
-Mean class 2 name right kidney mean_dice 0.922433 mean_hd95 3.186162
-Mean class 3 name left kidney mean_dice 0.000000 mean_hd95 0.000000
-Testing performance in best val model: mean_dice : 0.307478 mean_hd95 : 1.062054
+Testing performance in best val model: mean_dice : 0.916345 mean_hd95 : 24.383716
 Testing Finished!
-mIoU per class: [0, 0.8937961395811642, 0]
+mIoU: 0.8568786750367607
+
+full
+Testing performance in best val model: mean_dice : 0.919842 mean_hd95 : 17.782196
+Testing Finished!
+mIoU: 0.8630961354399227
+
