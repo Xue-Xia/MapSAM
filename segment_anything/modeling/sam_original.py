@@ -11,54 +11,10 @@ from icecream import ic
 
 from typing import Any, Dict, List, Tuple
 
-from .common import LayerNorm2d
 from .image_encoder import ImageEncoderViT
 from .mask_decoder import MaskDecoder
 from .prompt_encoder import PromptEncoder
 
-
-def get_max_dist_point(mask_tensor):
-    # Compute the distance transform of the binary mask
-    kernel = torch.tensor([[[[1, 1, 1], [1, 0, 1], [1, 1, 1]]]], dtype=torch.float32, device=mask_tensor.device)
-    dist_transform = F.conv2d(mask_tensor, kernel, padding=1)
-
-    # Find the location of the point with maximum distance value
-    max_dist = torch.max(dist_transform)
-    max_dist_idx = torch.where(dist_transform == max_dist)
-    coord = torch.tensor([max_dist_idx[2][0], max_dist_idx[1][0]], dtype=torch.float32, device=mask_tensor.device).unsqueeze(0).unsqueeze(0)  # (x, y) coordinates
-    label = torch.tensor([1], dtype=torch.float32, device=mask_tensor.device).unsqueeze(0)
-    point = (coord, label)
-
-    return point
-
-def get_max_dist_points(mask_tensor, num_points=3):
-    # Compute the distance transform of the binary mask
-    kernel = torch.tensor([[[[1, 1, 1], [1, 0, 1], [1, 1, 1]]]], dtype=torch.float32, device=mask_tensor.device)
-    dist_transform = F.conv2d(mask_tensor, kernel, padding=1)
-
-    # Find the top three maximum distance values and their corresponding indices
-    max_dists, max_dist_indices = torch.topk(dist_transform.view(-1), k=num_points)
-
-    # Convert indices to coordinates
-    points = [(max_dist_indices[i] // dist_transform.shape[3], max_dist_indices[i] % dist_transform.shape[3]) for i in range(num_points)]
-
-    return points
-
-class SPGen(nn.Module):
-    def __init__(self):
-        super(SPGen, self).__init__()
-
-        self.hint = nn.Sequential(nn.Conv2d(256, 64, kernel_size=1, stride=1),
-                                 LayerNorm2d(64),
-                                 nn.GELU(),
-                                 nn.Conv2d(64, 16, kernel_size=1, stride=1),
-                                 LayerNorm2d(16),
-                                 nn.GELU(),
-                                 nn.Conv2d(16, 1, kernel_size=1))
-
-    def forward(self, x):
-        x = self.hint(x)
-        return x
 
 class Sam(nn.Module):
     mask_threshold: float = 0.0
@@ -86,7 +42,6 @@ class Sam(nn.Module):
         """
         super().__init__()
         self.image_encoder = image_encoder
-        self.spgen = SPGen()
         self.prompt_encoder = prompt_encoder
         self.mask_decoder = mask_decoder
         self.register_buffer("pixel_mean", torch.Tensor(pixel_mean).view(-1, 1, 1), False)
@@ -106,49 +61,27 @@ class Sam(nn.Module):
     def forward_train(self, batched_input, multimask_output, image_size):
         input_images = self.preprocess(batched_input)
         image_embeddings = self.image_encoder(input_images)
-        coarse_mask = self.spgen(image_embeddings)
-        coarse_mask_up4 = F.interpolate(coarse_mask, size=(int(image_size/4), int(image_size/4)), mode="bilinear")
-        coarse_mask_up16 = F.interpolate(coarse_mask, size=(image_size, image_size), mode="bilinear")
-
-        spgen_prob = torch.sigmoid(coarse_mask_up4.detach())
-        spgen_prob[spgen_prob >= 0.95] = 1
-        spgen_prob[spgen_prob < 0.95] = 0
-
+        sparse_embeddings, dense_embeddings = self.prompt_encoder(
+            points=None, boxes=None, masks=None
+        )
+        low_res_masks, iou_predictions = self.mask_decoder(
+            image_embeddings=image_embeddings,
+            image_pe=self.prompt_encoder.get_dense_pe(),
+            sparse_prompt_embeddings=sparse_embeddings,
+            dense_prompt_embeddings=dense_embeddings,
+            multimask_output=multimask_output
+        )
+        masks = self.postprocess_masks(
+            low_res_masks,
+            input_size=(image_size, image_size),
+            original_size=(image_size, image_size)
+        )
         outputs = {
-                'masks': [],
-                'iou_predictions': [],
-                'low_res_logits': []
-            }
-        for idx in range(batched_input.shape[0]): # for each batch
-            # use distance transform to find a point inside the mask
-            fg_point = get_max_dist_point(coarse_mask_up16[idx].unsqueeze(0))
-            sparse_embeddings, dense_embeddings = self.prompt_encoder(
-                points=fg_point,
-                boxes=None,
-                masks=spgen_prob[idx].unsqueeze(0),
-            )
-
-            low_res_masks, iou_predictions = self.mask_decoder(
-                image_embeddings=image_embeddings[idx].unsqueeze(0),
-                image_pe=self.prompt_encoder.get_dense_pe(),
-                sparse_prompt_embeddings=sparse_embeddings,
-                dense_prompt_embeddings=dense_embeddings,
-                multimask_output=multimask_output
-            )
-            masks = self.postprocess_masks(
-                low_res_masks,
-                input_size=(image_size, image_size),
-                original_size=(image_size, image_size)
-            )
-            outputs['masks'].append(masks)
-            outputs['iou_predictions'].append(iou_predictions)
-            outputs['low_res_logits'].append(low_res_masks)
-
-        outputs['masks'] = torch.stack(outputs['masks'], dim=0).squeeze(1)
-        outputs['iou_predictions'] = torch.stack(outputs['iou_predictions'], dim=0).squeeze(1)
-        outputs['low_res_logits'] = torch.stack(outputs['low_res_logits'], dim=0).squeeze(1)
-
-        return outputs, coarse_mask_up4
+            'masks': masks,
+            'iou_predictions': iou_predictions,
+            'low_res_logits': low_res_masks
+        }
+        return outputs
 
     @torch.no_grad()
     def forward_test(
@@ -197,24 +130,16 @@ class Sam(nn.Module):
         input_images = torch.stack([self.preprocess(x["image"]) for x in batched_input], dim=0)
         image_embeddings = self.image_encoder(input_images)
 
-        coarse_mask = self.spgen(image_embeddings)
-        coarse_mask_up4 = self.up4(coarse_mask)
-        coarse_mask_up16 = self.up4(coarse_mask_up4)
-
-        spgen_prob = torch.sigmoid(coarse_mask_up4.detach())
-        spgen_prob[spgen_prob >= 0.95] = 1
-        spgen_prob[spgen_prob < 0.95] = 0
-
         outputs = []
-        for image_record, curr_embedding, curr_mask, curr_spgen in zip(batched_input, image_embeddings, coarse_mask_up16, spgen_prob):
+        for image_record, curr_embedding in zip(batched_input, image_embeddings):
             if "point_coords" in image_record:
                 points = (image_record["point_coords"], image_record["point_labels"])
             else:
-                points = get_max_dist_point(curr_mask.unsqueeze(0))
+                points = None
             sparse_embeddings, dense_embeddings = self.prompt_encoder(
                 points=points,
                 boxes=image_record.get("boxes", None),
-                masks=curr_spgen.unsqueeze(0),
+                masks=image_record.get("mask_inputs", None),
             )
             low_res_masks, iou_predictions = self.mask_decoder(
                 image_embeddings=curr_embedding.unsqueeze(0),

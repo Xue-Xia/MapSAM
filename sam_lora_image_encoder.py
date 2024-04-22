@@ -106,6 +106,12 @@ class LoRA_Sam(nn.Module):
                 w_a_linear_v,
                 w_b_linear_v,
             )
+
+        # for param in sam_model.prompt_encoder.parameters():
+        #     param.requires_grad = False
+        # for param in sam_model.mask_decoder.transformer.parameters():
+        #     param.requires_grad = False
+
         self.reset_parameters()
         self.sam = sam_model
 
@@ -124,6 +130,7 @@ class LoRA_Sam(nn.Module):
         b_tensors = {f"w_b_{i:03d}": self.w_Bs[i].weight for i in range(num_layer)}
         prompt_encoder_tensors = {}
         mask_decoder_tensors = {}
+        spgen_tensors = {}
 
         # save prompt encoder, only `state_dict`, the `named_parameter` is not permitted
         if isinstance(self.sam, torch.nn.DataParallel) or isinstance(self.sam, torch.nn.parallel.DistributedDataParallel):
@@ -135,8 +142,10 @@ class LoRA_Sam(nn.Module):
                 prompt_encoder_tensors[key] = value
             if 'mask_decoder' in key:
                 mask_decoder_tensors[key] = value
+            if 'spgen' in key:
+                spgen_tensors[key] = value
 
-        merged_dict = {**a_tensors, **b_tensors, **prompt_encoder_tensors, **mask_decoder_tensors}
+        merged_dict = {**a_tensors, **b_tensors, **spgen_tensors, **prompt_encoder_tensors, **mask_decoder_tensors}
         torch.save(merged_dict, filename)
 
     def load_lora_parameters(self, filename: str) -> None:
@@ -163,6 +172,12 @@ class LoRA_Sam(nn.Module):
 
         sam_dict = self.sam.state_dict()
         sam_keys = sam_dict.keys()
+
+        # load self prompt generator
+        spgen_keys = [k for k in sam_keys if 'spgen' in k]
+        spgen_values = [state_dict[k] for k in spgen_keys]
+        spgen_new_state_dict = {k: v for k, v in zip(spgen_keys, spgen_values)}
+        sam_dict.update(spgen_new_state_dict)
 
         # load prompt encoder
         prompt_encoder_keys = [k for k in sam_keys if 'prompt_encoder' in k]

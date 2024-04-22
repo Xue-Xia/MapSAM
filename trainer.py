@@ -19,12 +19,16 @@ from torchvision import transforms
 from icecream import ic
 
 
-def calc_loss(outputs, low_res_label_batch, ce_loss, dice_loss, dice_weight:float=0.8):
+def calc_loss(outputs, coarse_mask, low_res_label_batch, ce_loss, dice_loss, hint_loss, dice_weight:float=0.8):
     low_res_logits = outputs['low_res_logits']
     loss_ce = ce_loss(low_res_logits, low_res_label_batch[:].long())
     loss_dice = dice_loss(low_res_logits, low_res_label_batch, softmax=True)
-    loss = (1 - dice_weight) * loss_ce + dice_weight * loss_dice
-    return loss, loss_ce, loss_dice
+
+    pred_hint = torch.sigmoid(coarse_mask).squeeze()
+    loss_hint = hint_loss(pred_hint, low_res_label_batch.float())
+
+    loss = (1 - dice_weight) * loss_ce + dice_weight * loss_dice + loss_hint
+    return loss, loss_ce, loss_dice, loss_hint
 
 
 def trainer_synapse(args, model, snapshot_path, multimask_output, low_res):
@@ -52,6 +56,7 @@ def trainer_synapse(args, model, snapshot_path, multimask_output, low_res):
     model.train()
     ce_loss = CrossEntropyLoss()
     dice_loss = DiceLoss(num_classes + 1)
+    hint_loss = nn.BCELoss()
     if args.warmup:
         b_lr = base_lr / args.warmup_period
     else:
@@ -75,8 +80,8 @@ def trainer_synapse(args, model, snapshot_path, multimask_output, low_res):
             image_batch, label_batch = image_batch.cuda(), label_batch.cuda()
             low_res_label_batch = low_res_label_batch.cuda()
             assert image_batch.max() <= 3, f'image_batch max: {image_batch.max()}'
-            outputs = model(image_batch, multimask_output, args.img_size)
-            loss, loss_ce, loss_dice = calc_loss(outputs, low_res_label_batch, ce_loss, dice_loss, args.dice_param)
+            outputs, coarse_mask = model(image_batch, multimask_output, args.img_size)
+            loss, loss_ce, loss_dice, loss_hint = calc_loss(outputs, coarse_mask, low_res_label_batch, ce_loss, dice_loss, hint_loss, args.dice_param)
             optimizer.zero_grad()
             loss.backward()
             optimizer.step()
@@ -99,8 +104,9 @@ def trainer_synapse(args, model, snapshot_path, multimask_output, low_res):
             writer.add_scalar('info/total_loss', loss, iter_num)
             writer.add_scalar('info/loss_ce', loss_ce, iter_num)
             writer.add_scalar('info/loss_dice', loss_dice, iter_num)
+            writer.add_scalar('info/loss_hint', loss_hint, iter_num)
 
-            logging.info('iteration %d : loss : %f, loss_ce: %f, loss_dice: %f' % (iter_num, loss.item(), loss_ce.item(), loss_dice.item()))
+            logging.info('iteration %d : loss : %f, loss_ce: %f, loss_dice: %f, loss_hint: %f' % (iter_num, loss.item(), loss_ce.item(), loss_dice.item(), loss_hint.item()))
 
             if iter_num % 20 == 0:
                 image = image_batch[1, 0:1, :, :]

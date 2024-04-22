@@ -1,4 +1,4 @@
-python train.py --root_path data/dataset_hm/partial_1 --output result/ --warmup --AdamW --n_gpu 1 --batch_size 8 --max_epochs 200 --num_classes 1
+python train.py --root_path data/dataset_hm/fewshot10 --output result/ --warmup --AdamW --n_gpu 1 --batch_size 8 --max_epochs 200 --num_classes 1
 
 python test.py --is_savenii --volume_path data/dataset_hm --output_dir result/ --num_classes 1 --lora_ckpt checkpoints/epoch_159.pth
 
@@ -17,3 +17,393 @@ Testing performance in best val model: mean_dice : 0.919842 mean_hd95 : 17.78219
 Testing Finished!
 mIoU: 0.8630961354399227
 
+fewshot10 SAMed
+Testing performance in best val model: mean_dice : 0.846210 mean_hd95 : 27.794686
+Testing Finished!
+mIoU: 0.754383105373541
+
+fewshot10 SAMed_SP
+
+
+
+
+
+LoRA_Sam(
+  (sam): Sam(
+    (image_encoder): ImageEncoderViT(
+      (patch_embed): PatchEmbed(
+        (proj): Conv2d(3, 768, kernel_size=(16, 16), stride=(16, 16))
+      )
+      (blocks): ModuleList(
+        (0): Block(
+          (norm1): LayerNorm((768,), eps=1e-06, elementwise_affine=True)
+          (attn): Attention(
+            (qkv): _LoRA_qkv(
+              (qkv): Linear(in_features=768, out_features=2304, bias=True)
+              (linear_a_q): Linear(in_features=768, out_features=4, bias=False)
+              (linear_b_q): Linear(in_features=4, out_features=768, bias=False)
+              (linear_a_v): Linear(in_features=768, out_features=4, bias=False)
+              (linear_b_v): Linear(in_features=4, out_features=768, bias=False)
+            )
+            (proj): Linear(in_features=768, out_features=768, bias=True)
+          )
+          (norm2): LayerNorm((768,), eps=1e-06, elementwise_affine=True)
+          (mlp): MLPBlock(
+            (lin1): Linear(in_features=768, out_features=3072, bias=True)
+            (lin2): Linear(in_features=3072, out_features=768, bias=True)
+            (act): GELU()
+          )
+        )
+        (1): Block(
+          (norm1): LayerNorm((768,), eps=1e-06, elementwise_affine=True)
+          (attn): Attention(
+            (qkv): _LoRA_qkv(
+              (qkv): Linear(in_features=768, out_features=2304, bias=True)
+              (linear_a_q): Linear(in_features=768, out_features=4, bias=False)
+              (linear_b_q): Linear(in_features=4, out_features=768, bias=False)
+              (linear_a_v): Linear(in_features=768, out_features=4, bias=False)
+              (linear_b_v): Linear(in_features=4, out_features=768, bias=False)
+            )
+            (proj): Linear(in_features=768, out_features=768, bias=True)
+          )
+          (norm2): LayerNorm((768,), eps=1e-06, elementwise_affine=True)
+          (mlp): MLPBlock(
+            (lin1): Linear(in_features=768, out_features=3072, bias=True)
+            (lin2): Linear(in_features=3072, out_features=768, bias=True)
+            (act): GELU()
+          )
+        )
+        (2): Block(
+          (norm1): LayerNorm((768,), eps=1e-06, elementwise_affine=True)
+          (attn): Attention(
+            (qkv): _LoRA_qkv(
+              (qkv): Linear(in_features=768, out_features=2304, bias=True)
+              (linear_a_q): Linear(in_features=768, out_features=4, bias=False)
+              (linear_b_q): Linear(in_features=4, out_features=768, bias=False)
+              (linear_a_v): Linear(in_features=768, out_features=4, bias=False)
+              (linear_b_v): Linear(in_features=4, out_features=768, bias=False)
+            )
+            (proj): Linear(in_features=768, out_features=768, bias=True)
+          )
+          (norm2): LayerNorm((768,), eps=1e-06, elementwise_affine=True)
+          (mlp): MLPBlock(
+            (lin1): Linear(in_features=768, out_features=3072, bias=True)
+            (lin2): Linear(in_features=3072, out_features=768, bias=True)
+            (act): GELU()
+          )
+        )
+        (3): Block(
+          (norm1): LayerNorm((768,), eps=1e-06, elementwise_affine=True)
+          (attn): Attention(
+            (qkv): _LoRA_qkv(
+              (qkv): Linear(in_features=768, out_features=2304, bias=True)
+              (linear_a_q): Linear(in_features=768, out_features=4, bias=False)
+              (linear_b_q): Linear(in_features=4, out_features=768, bias=False)
+              (linear_a_v): Linear(in_features=768, out_features=4, bias=False)
+              (linear_b_v): Linear(in_features=4, out_features=768, bias=False)
+            )
+            (proj): Linear(in_features=768, out_features=768, bias=True)
+          )
+          (norm2): LayerNorm((768,), eps=1e-06, elementwise_affine=True)
+          (mlp): MLPBlock(
+            (lin1): Linear(in_features=768, out_features=3072, bias=True)
+            (lin2): Linear(in_features=3072, out_features=768, bias=True)
+            (act): GELU()
+          )
+        )
+        (4): Block(
+          (norm1): LayerNorm((768,), eps=1e-06, elementwise_affine=True)
+          (attn): Attention(
+            (qkv): _LoRA_qkv(
+              (qkv): Linear(in_features=768, out_features=2304, bias=True)
+              (linear_a_q): Linear(in_features=768, out_features=4, bias=False)
+              (linear_b_q): Linear(in_features=4, out_features=768, bias=False)
+              (linear_a_v): Linear(in_features=768, out_features=4, bias=False)
+              (linear_b_v): Linear(in_features=4, out_features=768, bias=False)
+            )
+            (proj): Linear(in_features=768, out_features=768, bias=True)
+          )
+          (norm2): LayerNorm((768,), eps=1e-06, elementwise_affine=True)
+          (mlp): MLPBlock(
+            (lin1): Linear(in_features=768, out_features=3072, bias=True)
+            (lin2): Linear(in_features=3072, out_features=768, bias=True)
+            (act): GELU()
+          )
+        )
+        (5): Block(
+          (norm1): LayerNorm((768,), eps=1e-06, elementwise_affine=True)
+          (attn): Attention(
+            (qkv): _LoRA_qkv(
+              (qkv): Linear(in_features=768, out_features=2304, bias=True)
+              (linear_a_q): Linear(in_features=768, out_features=4, bias=False)
+              (linear_b_q): Linear(in_features=4, out_features=768, bias=False)
+              (linear_a_v): Linear(in_features=768, out_features=4, bias=False)
+              (linear_b_v): Linear(in_features=4, out_features=768, bias=False)
+            )
+            (proj): Linear(in_features=768, out_features=768, bias=True)
+          )
+          (norm2): LayerNorm((768,), eps=1e-06, elementwise_affine=True)
+          (mlp): MLPBlock(
+            (lin1): Linear(in_features=768, out_features=3072, bias=True)
+            (lin2): Linear(in_features=3072, out_features=768, bias=True)
+            (act): GELU()
+          )
+        )
+        (6): Block(
+          (norm1): LayerNorm((768,), eps=1e-06, elementwise_affine=True)
+          (attn): Attention(
+            (qkv): _LoRA_qkv(
+              (qkv): Linear(in_features=768, out_features=2304, bias=True)
+              (linear_a_q): Linear(in_features=768, out_features=4, bias=False)
+              (linear_b_q): Linear(in_features=4, out_features=768, bias=False)
+              (linear_a_v): Linear(in_features=768, out_features=4, bias=False)
+              (linear_b_v): Linear(in_features=4, out_features=768, bias=False)
+            )
+            (proj): Linear(in_features=768, out_features=768, bias=True)
+          )
+          (norm2): LayerNorm((768,), eps=1e-06, elementwise_affine=True)
+          (mlp): MLPBlock(
+            (lin1): Linear(in_features=768, out_features=3072, bias=True)
+            (lin2): Linear(in_features=3072, out_features=768, bias=True)
+            (act): GELU()
+          )
+        )
+        (7): Block(
+          (norm1): LayerNorm((768,), eps=1e-06, elementwise_affine=True)
+          (attn): Attention(
+            (qkv): _LoRA_qkv(
+              (qkv): Linear(in_features=768, out_features=2304, bias=True)
+              (linear_a_q): Linear(in_features=768, out_features=4, bias=False)
+              (linear_b_q): Linear(in_features=4, out_features=768, bias=False)
+              (linear_a_v): Linear(in_features=768, out_features=4, bias=False)
+              (linear_b_v): Linear(in_features=4, out_features=768, bias=False)
+            )
+            (proj): Linear(in_features=768, out_features=768, bias=True)
+          )
+          (norm2): LayerNorm((768,), eps=1e-06, elementwise_affine=True)
+          (mlp): MLPBlock(
+            (lin1): Linear(in_features=768, out_features=3072, bias=True)
+            (lin2): Linear(in_features=3072, out_features=768, bias=True)
+            (act): GELU()
+          )
+        )
+        (8): Block(
+          (norm1): LayerNorm((768,), eps=1e-06, elementwise_affine=True)
+          (attn): Attention(
+            (qkv): _LoRA_qkv(
+              (qkv): Linear(in_features=768, out_features=2304, bias=True)
+              (linear_a_q): Linear(in_features=768, out_features=4, bias=False)
+              (linear_b_q): Linear(in_features=4, out_features=768, bias=False)
+              (linear_a_v): Linear(in_features=768, out_features=4, bias=False)
+              (linear_b_v): Linear(in_features=4, out_features=768, bias=False)
+            )
+            (proj): Linear(in_features=768, out_features=768, bias=True)
+          )
+          (norm2): LayerNorm((768,), eps=1e-06, elementwise_affine=True)
+          (mlp): MLPBlock(
+            (lin1): Linear(in_features=768, out_features=3072, bias=True)
+            (lin2): Linear(in_features=3072, out_features=768, bias=True)
+            (act): GELU()
+          )
+        )
+        (9): Block(
+          (norm1): LayerNorm((768,), eps=1e-06, elementwise_affine=True)
+          (attn): Attention(
+            (qkv): _LoRA_qkv(
+              (qkv): Linear(in_features=768, out_features=2304, bias=True)
+              (linear_a_q): Linear(in_features=768, out_features=4, bias=False)
+              (linear_b_q): Linear(in_features=4, out_features=768, bias=False)
+              (linear_a_v): Linear(in_features=768, out_features=4, bias=False)
+              (linear_b_v): Linear(in_features=4, out_features=768, bias=False)
+            )
+            (proj): Linear(in_features=768, out_features=768, bias=True)
+          )
+          (norm2): LayerNorm((768,), eps=1e-06, elementwise_affine=True)
+          (mlp): MLPBlock(
+            (lin1): Linear(in_features=768, out_features=3072, bias=True)
+            (lin2): Linear(in_features=3072, out_features=768, bias=True)
+            (act): GELU()
+          )
+        )
+        (10): Block(
+          (norm1): LayerNorm((768,), eps=1e-06, elementwise_affine=True)
+          (attn): Attention(
+            (qkv): _LoRA_qkv(
+              (qkv): Linear(in_features=768, out_features=2304, bias=True)
+              (linear_a_q): Linear(in_features=768, out_features=4, bias=False)
+              (linear_b_q): Linear(in_features=4, out_features=768, bias=False)
+              (linear_a_v): Linear(in_features=768, out_features=4, bias=False)
+              (linear_b_v): Linear(in_features=4, out_features=768, bias=False)
+            )
+            (proj): Linear(in_features=768, out_features=768, bias=True)
+          )
+          (norm2): LayerNorm((768,), eps=1e-06, elementwise_affine=True)
+          (mlp): MLPBlock(
+            (lin1): Linear(in_features=768, out_features=3072, bias=True)
+            (lin2): Linear(in_features=3072, out_features=768, bias=True)
+            (act): GELU()
+          )
+        )
+        (11): Block(
+          (norm1): LayerNorm((768,), eps=1e-06, elementwise_affine=True)
+          (attn): Attention(
+            (qkv): _LoRA_qkv(
+              (qkv): Linear(in_features=768, out_features=2304, bias=True)
+              (linear_a_q): Linear(in_features=768, out_features=4, bias=False)
+              (linear_b_q): Linear(in_features=4, out_features=768, bias=False)
+              (linear_a_v): Linear(in_features=768, out_features=4, bias=False)
+              (linear_b_v): Linear(in_features=4, out_features=768, bias=False)
+            )
+            (proj): Linear(in_features=768, out_features=768, bias=True)
+          )
+          (norm2): LayerNorm((768,), eps=1e-06, elementwise_affine=True)
+          (mlp): MLPBlock(
+            (lin1): Linear(in_features=768, out_features=3072, bias=True)
+            (lin2): Linear(in_features=3072, out_features=768, bias=True)
+            (act): GELU()
+          )
+        )
+      )
+      (neck): Sequential(
+        (0): Conv2d(768, 256, kernel_size=(1, 1), stride=(1, 1), bias=False)
+        (1): LayerNorm2d()
+        (2): Conv2d(256, 256, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False)
+        (3): LayerNorm2d()
+      )
+    )
+    (spgen): SPGen(
+      (hint): Sequential(
+        (0): Conv2d(256, 64, kernel_size=(1, 1), stride=(1, 1))
+        (1): LayerNorm2d()
+        (2): GELU()
+        (3): Conv2d(64, 16, kernel_size=(1, 1), stride=(1, 1))
+        (4): LayerNorm2d()
+        (5): GELU()
+        (6): Conv2d(16, 1, kernel_size=(1, 1), stride=(1, 1))
+      )
+    )
+    (prompt_encoder): PromptEncoder(
+      (pe_layer): PositionEmbeddingRandom()
+      (point_embeddings): ModuleList(
+        (0): Embedding(1, 256)
+        (1): Embedding(1, 256)
+        (2): Embedding(1, 256)
+        (3): Embedding(1, 256)
+      )
+      (not_a_point_embed): Embedding(1, 256)
+      (mask_downscaling): Sequential(
+        (0): Conv2d(1, 4, kernel_size=(2, 2), stride=(2, 2))
+        (1): LayerNorm2d()
+        (2): GELU()
+        (3): Conv2d(4, 16, kernel_size=(2, 2), stride=(2, 2))
+        (4): LayerNorm2d()
+        (5): GELU()
+        (6): Conv2d(16, 256, kernel_size=(1, 1), stride=(1, 1))
+      )
+      (no_mask_embed): Embedding(1, 256)
+    )
+    (mask_decoder): MaskDecoder(
+      (transformer): TwoWayTransformer(
+        (layers): ModuleList(
+          (0): TwoWayAttentionBlock(
+            (self_attn): Attention(
+              (q_proj): Linear(in_features=256, out_features=256, bias=True)
+              (k_proj): Linear(in_features=256, out_features=256, bias=True)
+              (v_proj): Linear(in_features=256, out_features=256, bias=True)
+              (out_proj): Linear(in_features=256, out_features=256, bias=True)
+            )
+            (norm1): LayerNorm((256,), eps=1e-05, elementwise_affine=True)
+            (cross_attn_token_to_image): Attention(
+              (q_proj): Linear(in_features=256, out_features=128, bias=True)
+              (k_proj): Linear(in_features=256, out_features=128, bias=True)
+              (v_proj): Linear(in_features=256, out_features=128, bias=True)
+              (out_proj): Linear(in_features=128, out_features=256, bias=True)
+            )
+            (norm2): LayerNorm((256,), eps=1e-05, elementwise_affine=True)
+            (mlp): MLPBlock(
+              (lin1): Linear(in_features=256, out_features=2048, bias=True)
+              (lin2): Linear(in_features=2048, out_features=256, bias=True)
+              (act): ReLU()
+            )
+            (norm3): LayerNorm((256,), eps=1e-05, elementwise_affine=True)
+            (norm4): LayerNorm((256,), eps=1e-05, elementwise_affine=True)
+            (cross_attn_image_to_token): Attention(
+              (q_proj): Linear(in_features=256, out_features=128, bias=True)
+              (k_proj): Linear(in_features=256, out_features=128, bias=True)
+              (v_proj): Linear(in_features=256, out_features=128, bias=True)
+              (out_proj): Linear(in_features=128, out_features=256, bias=True)
+            )
+          )
+          (1): TwoWayAttentionBlock(
+            (self_attn): Attention(
+              (q_proj): Linear(in_features=256, out_features=256, bias=True)
+              (k_proj): Linear(in_features=256, out_features=256, bias=True)
+              (v_proj): Linear(in_features=256, out_features=256, bias=True)
+              (out_proj): Linear(in_features=256, out_features=256, bias=True)
+            )
+            (norm1): LayerNorm((256,), eps=1e-05, elementwise_affine=True)
+            (cross_attn_token_to_image): Attention(
+              (q_proj): Linear(in_features=256, out_features=128, bias=True)
+              (k_proj): Linear(in_features=256, out_features=128, bias=True)
+              (v_proj): Linear(in_features=256, out_features=128, bias=True)
+              (out_proj): Linear(in_features=128, out_features=256, bias=True)
+            )
+            (norm2): LayerNorm((256,), eps=1e-05, elementwise_affine=True)
+            (mlp): MLPBlock(
+              (lin1): Linear(in_features=256, out_features=2048, bias=True)
+              (lin2): Linear(in_features=2048, out_features=256, bias=True)
+              (act): ReLU()
+            )
+            (norm3): LayerNorm((256,), eps=1e-05, elementwise_affine=True)
+            (norm4): LayerNorm((256,), eps=1e-05, elementwise_affine=True)
+            (cross_attn_image_to_token): Attention(
+              (q_proj): Linear(in_features=256, out_features=128, bias=True)
+              (k_proj): Linear(in_features=256, out_features=128, bias=True)
+              (v_proj): Linear(in_features=256, out_features=128, bias=True)
+              (out_proj): Linear(in_features=128, out_features=256, bias=True)
+            )
+          )
+        )
+        (final_attn_token_to_image): Attention(
+          (q_proj): Linear(in_features=256, out_features=128, bias=True)
+          (k_proj): Linear(in_features=256, out_features=128, bias=True)
+          (v_proj): Linear(in_features=256, out_features=128, bias=True)
+          (out_proj): Linear(in_features=128, out_features=256, bias=True)
+        )
+        (norm_final_attn): LayerNorm((256,), eps=1e-05, elementwise_affine=True)
+      )
+      (iou_token): Embedding(1, 256)
+      (mask_tokens): Embedding(2, 256)
+      (output_upscaling): Sequential(
+        (0): ConvTranspose2d(256, 64, kernel_size=(2, 2), stride=(2, 2))
+        (1): LayerNorm2d()
+        (2): GELU()
+        (3): ConvTranspose2d(64, 32, kernel_size=(2, 2), stride=(2, 2))
+        (4): GELU()
+      )
+      (output_hypernetworks_mlps): ModuleList(
+        (0): MLP(
+          (layers): ModuleList(
+            (0): Linear(in_features=256, out_features=256, bias=True)
+            (1): Linear(in_features=256, out_features=256, bias=True)
+            (2): Linear(in_features=256, out_features=32, bias=True)
+          )
+        )
+        (1): MLP(
+          (layers): ModuleList(
+            (0): Linear(in_features=256, out_features=256, bias=True)
+            (1): Linear(in_features=256, out_features=256, bias=True)
+            (2): Linear(in_features=256, out_features=32, bias=True)
+          )
+        )
+      )
+      (iou_prediction_head): MLP(
+        (layers): ModuleList(
+          (0): Linear(in_features=256, out_features=256, bias=True)
+          (1): Linear(in_features=256, out_features=256, bias=True)
+          (2): Linear(in_features=256, out_features=2, bias=True)
+        )
+      )
+    )
+  )
+)
