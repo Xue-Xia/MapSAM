@@ -111,8 +111,8 @@ class Sam(nn.Module):
         coarse_mask_up16 = F.interpolate(coarse_mask, size=(image_size, image_size), mode="bilinear")
 
         spgen_prob = torch.sigmoid(coarse_mask_up4.detach())
-        spgen_prob[spgen_prob >= 0.95] = 1
-        spgen_prob[spgen_prob < 0.95] = 0
+        spgen_prob[spgen_prob >= 0.75] = 1
+        spgen_prob[spgen_prob < 0.75] = 0
 
         outputs = {
                 'masks': [],
@@ -202,8 +202,8 @@ class Sam(nn.Module):
         coarse_mask_up16 = self.up4(coarse_mask_up4)
 
         spgen_prob = torch.sigmoid(coarse_mask_up4.detach())
-        spgen_prob[spgen_prob >= 0.95] = 1
-        spgen_prob[spgen_prob < 0.95] = 0
+        spgen_prob[spgen_prob >= 0.75] = 1
+        spgen_prob[spgen_prob < 0.75] = 0
 
         outputs = []
         for image_record, curr_embedding, curr_mask, curr_spgen in zip(batched_input, image_embeddings, coarse_mask_up16, spgen_prob):

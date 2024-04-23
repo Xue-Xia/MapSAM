@@ -22,7 +22,10 @@ Testing performance in best val model: mean_dice : 0.846210 mean_hd95 : 27.79468
 Testing Finished!
 mIoU: 0.754383105373541
 
-fewshot10 SAMed_SP
+fewshot10 SAMed_SP (threshold 0.75)
+Testing performance in best val model: mean_dice : 0.776501 mean_hd95 : 59.389252
+Testing Finished!
+mIoU: 0.6575764988948983
 
 
 
