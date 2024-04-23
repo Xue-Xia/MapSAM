@@ -111,8 +111,8 @@ class Sam(nn.Module):
         coarse_mask_up16 = F.interpolate(coarse_mask, size=(image_size, image_size), mode="bilinear")
 
         spgen_prob = torch.sigmoid(coarse_mask_up4.detach())
-        spgen_prob[spgen_prob >= 0.75] = 1
-        spgen_prob[spgen_prob < 0.75] = 0
+        spgen_prob[spgen_prob >= 0.5] = 1
+        spgen_prob[spgen_prob < 0.5] = 0
 
         outputs = {
                 'masks': [],

@@ -27,8 +27,10 @@ Testing performance in best val model: mean_dice : 0.776501 mean_hd95 : 59.38925
 Testing Finished!
 mIoU: 0.6575764988948983
 
-
-
+fewshot10 SAMed_SP (threshold 0.5)
+Testing performance in best val model: mean_dice : 0.843312 mean_hd95 : 29.716276
+Testing Finished!
+mIoU: 0.7471221095630624
 
 
 LoRA_Sam(
