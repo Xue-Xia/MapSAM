@@ -120,6 +120,11 @@ class Sam(nn.Module):
                 'low_res_logits': []
             }
         for idx in range(batched_input.shape[0]): # for each batch
+
+            # Obtain the target guidance for cross-attention layers
+            attn_mask = (coarse_mask[idx].sigmoid().unsqueeze(0).unsqueeze(0).flatten(3) < 0.5).bool()
+            attn_mask = attn_mask.detach()
+
             # use distance transform to find a point inside the mask
             fg_point = get_max_dist_point(coarse_mask_up16[idx].unsqueeze(0))
             sparse_embeddings, dense_embeddings = self.prompt_encoder(
@@ -133,7 +138,9 @@ class Sam(nn.Module):
                 image_pe=self.prompt_encoder.get_dense_pe(),
                 sparse_prompt_embeddings=sparse_embeddings,
                 dense_prompt_embeddings=dense_embeddings,
-                multimask_output=multimask_output
+                multimask_output=multimask_output,
+                attn_mask=attn_mask,
+                target_embedding=None
             )
             masks = self.postprocess_masks(
                 low_res_masks,
