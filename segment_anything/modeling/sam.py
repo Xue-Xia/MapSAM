@@ -8,6 +8,7 @@ import torch
 from torch import nn
 from torch.nn import functional as F
 from icecream import ic
+import numpy as np
 
 from typing import Any, Dict, List, Tuple
 
@@ -16,6 +17,24 @@ from .image_encoder import ImageEncoderViT
 from .mask_decoder import MaskDecoder
 from .prompt_encoder import PromptEncoder
 
+
+def point_selection(mask, topk=1):
+    # Top-1 point selection
+    w, h = mask.shape
+    topk_xy = mask.flatten(0).topk(topk)[1]
+    topk_x = (topk_xy // h).unsqueeze(0)
+    topk_y = (topk_xy - topk_x * h)
+    topk_xy = torch.cat((topk_y, topk_x), dim=0).permute(1, 0)
+    topk_label = torch.tensor([1] * topk, device=mask.device)
+
+    # Top-last point selection
+    last_xy = mask.flatten(0).topk(topk, largest=False)[1]
+    last_x = (last_xy // h).unsqueeze(0)
+    last_y = (last_xy - last_x * h)
+    last_xy = torch.cat((last_y, last_x), dim=0).permute(1, 0)
+    last_label = torch.tensor([0] * topk, device=mask.device)
+
+    return topk_xy, topk_label, last_xy, last_label
 
 def get_max_dist_point(mask_tensor):
     # Compute the distance transform of the binary mask
@@ -31,18 +50,29 @@ def get_max_dist_point(mask_tensor):
 
     return point
 
-def get_max_dist_points(mask_tensor, num_points=3):
+def get_max_dist_points(mask_tensor, num_points=2):
     # Compute the distance transform of the binary mask
     kernel = torch.tensor([[[[1, 1, 1], [1, 0, 1], [1, 1, 1]]]], dtype=torch.float32, device=mask_tensor.device)
     dist_transform = F.conv2d(mask_tensor, kernel, padding=1)
 
-    # Find the top three maximum distance values and their corresponding indices
+    # Find the top num_points maximum distance values and their corresponding indices
     max_dists, max_dist_indices = torch.topk(dist_transform.view(-1), k=num_points)
 
-    # Convert indices to coordinates
-    points = [(max_dist_indices[i] // dist_transform.shape[3], max_dist_indices[i] % dist_transform.shape[3]) for i in range(num_points)]
+    # Initialize arrays for coordinates
+    coords = torch.zeros((1, num_points, 2), dtype=torch.float32, device=mask_tensor.device)  # Added extra dimension
 
-    return points
+    # Create a labels tensor with all ones, matching the number of points
+    labels = torch.ones(num_points, dtype=torch.float32, device=mask_tensor.device).unsqueeze(0)
+
+    # Convert indices to coordinates
+    for i in range(num_points):
+        y_coord = max_dist_indices[i] // dist_transform.shape[3]
+        x_coord = max_dist_indices[i] % dist_transform.shape[3]
+        coords[0, i, :] = torch.tensor([y_coord, x_coord], dtype=torch.float32, device=mask_tensor.device)
+
+    point = (coords, labels)
+    return point
+
 
 class SPGen(nn.Module):
     def __init__(self):
@@ -125,10 +155,17 @@ class Sam(nn.Module):
             attn_mask = (coarse_mask[idx].sigmoid().unsqueeze(0).unsqueeze(0).flatten(3) < 0.5).bool()
             attn_mask = attn_mask.detach()
 
+            # Positive-negative location prior
+            topk_xy_i, topk_label_i, last_xy_i, last_label_i = point_selection(coarse_mask_up16[idx].squeeze(0), topk=1)
+            topk_xy = torch.cat([topk_xy_i, last_xy_i], dim=0)
+            topk_label = torch.cat([topk_label_i, last_label_i], dim=0)
+            fg_points = (topk_xy.unsqueeze(0), topk_label.unsqueeze(0))
+
             # use distance transform to find a point inside the mask
-            fg_point = get_max_dist_point(coarse_mask_up16[idx].unsqueeze(0))
+            # fg_points = get_max_dist_points(coarse_mask_up16[idx].unsqueeze(0))
+
             sparse_embeddings, dense_embeddings = self.prompt_encoder(
-                points=fg_point,
+                points=fg_points,
                 boxes=None,
                 masks=spgen_prob[idx].unsqueeze(0),
             )

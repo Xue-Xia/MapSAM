@@ -3,9 +3,10 @@
   <component name="ChangeListManager">
     <list default="true" id="d1d67c38-cea2-4015-b40d-80b1ded2694a" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/segment_anything/modeling/mask_decoder.py" beforeDir="false" afterPath="$PROJECT_DIR$/segment_anything/modeling/mask_decoder.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/arg.txt" beforeDir="false" afterPath="$PROJECT_DIR$/arg.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/eval.py" beforeDir="false" afterPath="$PROJECT_DIR$/eval.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/segment_anything/modeling/sam.py" beforeDir="false" afterPath="$PROJECT_DIR$/segment_anything/modeling/sam.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/segment_anything/modeling/transformer.py" beforeDir="false" afterPath="$PROJECT_DIR$/segment_anything/modeling/transformer.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/train.py" beforeDir="false" afterPath="$PROJECT_DIR$/train.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -30,7 +31,7 @@
     &quot;last_opened_file_path&quot;: &quot;/local/home/xiaxue/Downloads/SAMed/train.py&quot;
   }
 }</component>
-  <component name="RunManager" selected="Python.test">
+  <component name="RunManager" selected="Python.eval">
     <configuration name="eval" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
       <module name="SAMed" />
       <option name="INTERPRETER_OPTIONS" value="" />
@@ -86,7 +87,7 @@
       <option name="ADD_CONTENT_ROOTS" value="true" />
       <option name="ADD_SOURCE_ROOTS" value="true" />
       <option name="SCRIPT_NAME" value="$PROJECT_DIR$/train.py" />
-      <option name="PARAMETERS" value="--root_path data/dataset_hm/fewshot10 --output result/ --warmup --AdamW --n_gpu 1 --batch_size 8 --max_epochs 200 --num_classes 1" />
+      <option name="PARAMETERS" value="--root_path data/dataset_hm/partial_1 --output result/ --warmup --AdamW --n_gpu 1 --batch_size 8 --max_epochs 200 --num_classes 1" />
       <option name="SHOW_COMMAND_LINE" value="false" />
       <option name="EMULATE_TERMINAL" value="false" />
       <option name="MODULE_MODE" value="false" />
@@ -134,11 +135,6 @@
           <url>file://$PROJECT_DIR$/utils_hm.py</url>
           <line>130</line>
           <option name="timeStamp" value="1" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/segment_anything/modeling/transformer.py</url>
-          <line>243</line>
-          <option name="timeStamp" value="6" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>

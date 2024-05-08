@@ -29,7 +29,7 @@ def calculate_iou_per_class(pred_mask, gt_mask, num_classes):
     return iou_per_class
 
 
-folder_path = "result/predictions_sp_partial1"
+folder_path = "result/predictions"
 files = os.listdir(folder_path)
 # num_classes = 3
 # total_iou_per_class = [0] * num_classes

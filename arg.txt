@@ -4,39 +4,41 @@ python test.py --is_savenii --volume_path data/dataset_hm --output_dir result/ -
 
 partial1
 Testing performance in best val model: mean_dice : 0.917539 mean_hd95 : 6.191715
-Testing Finished!
 mIoU: 0.8601029112604454
 
 partial10
 Testing performance in best val model: mean_dice : 0.916345 mean_hd95 : 24.383716
-Testing Finished!
 mIoU: 0.8568786750367607
 
 full
 Testing performance in best val model: mean_dice : 0.919842 mean_hd95 : 17.782196
-Testing Finished!
 mIoU: 0.8630961354399227
 
 fewshot10 SAMed
 Testing performance in best val model: mean_dice : 0.846210 mean_hd95 : 27.794686
-Testing Finished!
 mIoU: 0.754383105373541
 
-fewshot10 SAMed_SP (threshold 0.75)
-Testing performance in best val model: mean_dice : 0.776501 mean_hd95 : 59.389252
-Testing Finished!
-mIoU: 0.6575764988948983
-
-fewshot10 SAMed_SP (threshold 0.5)
+fewshot10 SAMed_SP
 Testing performance in best val model: mean_dice : 0.843312 mean_hd95 : 29.716276
-Testing Finished!
 mIoU: 0.7471221095630624
 
-partial1 SAMed_SP (threshold 0.5)
+partial1 SAMed_SP
 Testing performance in best val model: mean_dice : 0.922681 mean_hd95 : 7.293382
-Testing Finished!
 mIoU: 0.8682228094786153
 
+fewshot10 SAMed_SP_MA
+Testing performance in best val model: mean_dice : 0.802973 mean_hd95 : 20.305484
+Testing performance in best val model: mean_dice : 0.814966 mean_hd95 : 27.418982
+Testing performance in best val model: mean_dice : 0.805790 mean_hd95 : 33.230771
+Testing performance in best val model: mean_dice : 0.811156 mean_hd95 : 38.917559
+mIoU: 0.7120087812954797
+mIoU: 0.7173552723769617
+mIoU: 0.7074305155990204
+mIoU: 0.7098820974245553
+
+partial1 SAMed_SP_MA
+Testing performance in best val model: mean_dice : 0.908518 mean_hd95 : 9.761107
+mIoU: 0.8478499242666281
 
 LoRA_Sam(
   (sam): Sam(
