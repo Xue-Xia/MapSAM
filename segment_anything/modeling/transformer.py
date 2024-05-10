@@ -100,6 +100,7 @@ class TwoWayTransformer(nn.Module):
                 key_pe=image_pe,
                 attn_mask=attn_mask,
             )
+            attn_mask = self.forward_mask_head(queries, keys, image_pe)
 
         # Apply the final attenion layer from the points to the image
         q = queries + point_embedding
@@ -112,6 +113,18 @@ class TwoWayTransformer(nn.Module):
         queries = self.norm_final_attn(queries)
 
         return queries, keys
+
+    def forward_mask_head(self, q, k, image_pe):
+        q = self.norm_final_attn(q)
+        k = k + image_pe
+        mask_tokens_out = q[:, 1, :]
+        mask = mask_tokens_out @ k.permute(0, 2, 1)
+        attn_mask = (mask.sigmoid().unsqueeze(0) < 0.5).bool()
+        new_attn_mask = torch.zeros_like(attn_mask, dtype=torch.float)
+        new_attn_mask.masked_fill_(attn_mask, -1e9)
+        attn_mask = new_attn_mask
+        attn_mask = attn_mask.detach()
+        return attn_mask
 
 
 class TwoWayAttentionBlock(nn.Module):

@@ -12,6 +12,27 @@ from icecream import ic
 import cv2
 import matplotlib.pyplot as plt
 
+class FocalLoss(nn.Module):
+    def __init__(self, alpha=0.25, gamma=2):
+        super(FocalLoss, self).__init__()
+        self.alpha = alpha
+        self.gamma = gamma
+
+    def forward(self, preds, targets):
+        """
+        Calculate focal loss for binary semantic segmentation
+        :param preds: Size: [B, 1, H, W], raw predictions (after sigmoid) from the model
+        :param targets: Size: [B, 1, H, W], ground truth labels (0 or 1) for binary segmentation
+        :return: Focal loss
+        """
+        preds_sigmoid = torch.sigmoid(preds)
+        pt = torch.where(targets == 1, preds_sigmoid, 1 - preds_sigmoid)
+        loss = -((1 - pt) ** self.gamma) * torch.log(pt)
+
+        alpha_factor = torch.where(targets == 1, self.alpha * torch.ones_like(targets), (1 - self.alpha) * torch.ones_like(targets))
+        focal_loss = alpha_factor * loss
+
+        return focal_loss.mean()
 
 class Focal_loss(nn.Module):
     def __init__(self, alpha=0.25, gamma=2, num_classes=3, size_average=True):
@@ -128,8 +149,10 @@ def test_single_volume(image, label, net, classes, multimask_output, patch_size=
         net.eval()
         with torch.no_grad():
             outputs, coarse_mask = net(inputs, multimask_output, patch_size[0])
-            output_masks = outputs['masks']
-            out = torch.argmax(torch.softmax(output_masks, dim=1), dim=1).squeeze(0)
+            output_mask = outputs['masks']
+            # out = torch.argmax(torch.softmax(output_masks, dim=1), dim=1).squeeze(0)
+            out = (torch.sigmoid(output_mask).squeeze() > 0.5).int()
+            # print(out.shape)
             out = out.cpu().detach().numpy()
             out_h, out_w = out.shape
             if x != out_h or y != out_w:

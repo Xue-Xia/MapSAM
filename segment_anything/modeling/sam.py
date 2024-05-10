@@ -73,7 +73,6 @@ def get_max_dist_points(mask_tensor, num_points=2):
     point = (coords, labels)
     return point
 
-
 class SPGen(nn.Module):
     def __init__(self):
         super(SPGen, self).__init__()
@@ -88,6 +87,30 @@ class SPGen(nn.Module):
 
     def forward(self, x):
         x = self.hint(x)
+        return x
+
+class MLP(nn.Module):
+    def __init__(
+        self,
+        input_dim: int,
+        hidden_dim: int,
+        output_dim: int,
+        num_layers: int,
+        sigmoid_output: bool = False,
+    ) -> None:
+        super().__init__()
+        self.num_layers = num_layers
+        h = [hidden_dim] * (num_layers - 1)
+        self.layers = nn.ModuleList(
+            nn.Linear(n, k) for n, k in zip([input_dim] + h, h + [output_dim])
+        )
+        self.sigmoid_output = sigmoid_output
+
+    def forward(self, x):
+        for i, layer in enumerate(self.layers):
+            x = F.relu(layer(x)) if i < self.num_layers - 1 else layer(x)
+        if self.sigmoid_output:
+            x = F.sigmoid(x)
         return x
 
 class Sam(nn.Module):
@@ -116,7 +139,8 @@ class Sam(nn.Module):
         """
         super().__init__()
         self.image_encoder = image_encoder
-        self.spgen = SPGen()
+        # self.spgen = SPGen()
+        self.mask_head = MLP(256, 256, 1, 3)
         self.prompt_encoder = prompt_encoder
         self.mask_decoder = mask_decoder
         self.register_buffer("pixel_mean", torch.Tensor(pixel_mean).view(-1, 1, 1), False)
@@ -136,13 +160,15 @@ class Sam(nn.Module):
     def forward_train(self, batched_input, multimask_output, image_size):
         input_images = self.preprocess(batched_input)
         image_embeddings = self.image_encoder(input_images)
-        coarse_mask = self.spgen(image_embeddings)
+        b, c, h, w = image_embeddings.shape
+        # coarse_mask = self.spgen(image_embeddings)
+        coarse_mask = self.mask_head(image_embeddings.view(b,h*w,c)).view(b,1,h,w)
         coarse_mask_up4 = F.interpolate(coarse_mask, size=(int(image_size/4), int(image_size/4)), mode="bilinear")
         coarse_mask_up16 = F.interpolate(coarse_mask, size=(image_size, image_size), mode="bilinear")
 
-        spgen_prob = torch.sigmoid(coarse_mask_up4.detach())
-        spgen_prob[spgen_prob >= 0.5] = 1
-        spgen_prob[spgen_prob < 0.5] = 0
+        # spgen_prob = torch.sigmoid(coarse_mask_up4.detach())
+        # spgen_prob[spgen_prob >= 0.5] = 1
+        # spgen_prob[spgen_prob < 0.5] = 0
 
         outputs = {
                 'masks': [],
@@ -152,7 +178,10 @@ class Sam(nn.Module):
         for idx in range(batched_input.shape[0]): # for each batch
 
             # Obtain the target guidance for cross-attention layers
-            attn_mask = (coarse_mask[idx].sigmoid().unsqueeze(0).unsqueeze(0).flatten(3) < 0.5).bool()
+            attn_mask = (coarse_mask[idx].sigmoid().unsqueeze(0).unsqueeze(0).flatten(3) <0.5).bool()
+            new_attn_mask = torch.zeros_like(attn_mask, dtype=torch.float)
+            new_attn_mask.masked_fill_(attn_mask, -1e9)
+            attn_mask = new_attn_mask
             attn_mask = attn_mask.detach()
 
             # Positive-negative location prior
@@ -167,7 +196,8 @@ class Sam(nn.Module):
             sparse_embeddings, dense_embeddings = self.prompt_encoder(
                 points=fg_points,
                 boxes=None,
-                masks=spgen_prob[idx].unsqueeze(0),
+                # masks=spgen_prob[idx].unsqueeze(0),
+                masks=None,
             )
 
             low_res_masks, iou_predictions = self.mask_decoder(

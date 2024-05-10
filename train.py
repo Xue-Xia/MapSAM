@@ -35,7 +35,7 @@ parser.add_argument('--batch_size', type=int,
 parser.add_argument('--n_gpu', type=int, default=2, help='total gpu')
 parser.add_argument('--deterministic', type=int, default=1,
                     help='whether use deterministic training')
-parser.add_argument('--base_lr', type=float, default=0.001,
+parser.add_argument('--base_lr', type=float, default=0.005,
                     help='segmentation network learning rate')
 parser.add_argument('--img_size', type=int,
                     default=512, help='input patch size of network input')

@@ -31,14 +31,21 @@ Testing performance in best val model: mean_dice : 0.802973 mean_hd95 : 20.30548
 Testing performance in best val model: mean_dice : 0.814966 mean_hd95 : 27.418982
 Testing performance in best val model: mean_dice : 0.805790 mean_hd95 : 33.230771
 Testing performance in best val model: mean_dice : 0.811156 mean_hd95 : 38.917559
+Testing performance in best val model: mean_dice : 0.832859 mean_hd95 : 29.594086 no mask prompt
+Testing performance in best val model: mean_dice : 0.812582 mean_hd95 : 43.325931 mlp
 mIoU: 0.7120087812954797
 mIoU: 0.7173552723769617
 mIoU: 0.7074305155990204
 mIoU: 0.7098820974245553
+mIoU: 0.7393598321084476 no mask prompt
+mIoU: 0.7059460496612171 mlp
+mIoU: 0.6810537940318179 modifyMA
+mIoU: 0.6055374204669607 modifyMA+focalloss
 
 partial1 SAMed_SP_MA
 Testing performance in best val model: mean_dice : 0.908518 mean_hd95 : 9.761107
 mIoU: 0.8478499242666281
+mIoU: 0.8442473369363077 no mask prompt
 
 LoRA_Sam(
   (sam): Sam(

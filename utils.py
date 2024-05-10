@@ -11,7 +11,29 @@ from einops import repeat
 from icecream import ic
 
 
-class Focal_loss(nn.Module):
+class FocalLoss(nn.Module):
+    def __init__(self, alpha=0.25, gamma=2):
+        super(FocalLoss, self).__init__()
+        self.alpha = alpha
+        self.gamma = gamma
+
+    def forward(self, preds, targets):
+        """
+        Calculate focal loss for binary semantic segmentation
+        :param preds: Size: [B, 1, H, W], raw predictions (after sigmoid) from the model
+        :param targets: Size: [B, 1, H, W], ground truth labels (0 or 1) for binary segmentation
+        :return: Focal loss
+        """
+        preds_sigmoid = torch.sigmoid(preds)
+        pt = torch.where(targets == 1, preds_sigmoid, 1 - preds_sigmoid)
+        loss = -((1 - pt) ** self.gamma) * torch.log(pt)
+
+        alpha_factor = torch.where(targets == 1, self.alpha * torch.ones_like(targets), (1 - self.alpha) * torch.ones_like(targets))
+        focal_loss = alpha_factor * loss
+
+        return focal_loss.mean()
+
+class Focal_loss_(nn.Module):
     def __init__(self, alpha=0.25, gamma=2, num_classes=3, size_average=True):
         super(Focal_loss, self).__init__()
         self.size_average = size_average
@@ -57,8 +79,28 @@ class Focal_loss(nn.Module):
             loss = loss.sum()
         return loss
 
-
 class DiceLoss(nn.Module):
+    def __init__(self):
+        super(DiceLoss, self).__init__()
+
+    def _dice_loss(self, score, target):
+        smooth = 1e-5
+        intersect = torch.sum(score * target)
+        y_sum = torch.sum(target * target)
+        z_sum = torch.sum(score * score)
+        loss = (2 * intersect + smooth) / (z_sum + y_sum + smooth)
+        loss = 1 - loss
+        return loss
+
+    def forward(self, inputs, target, weight=None, softmax=False):
+        if softmax:
+            inputs = torch.softmax(inputs, dim=1)
+        target = target.float()
+        assert inputs.size() == target.size(), 'predict {} & target {} shape do not match'.format(inputs.size(), target.size())
+        dice = self._dice_loss(inputs, target)
+        return dice
+
+class DiceLoss_(nn.Module):
     def __init__(self, n_classes):
         super(DiceLoss, self).__init__()
         self.n_classes = n_classes

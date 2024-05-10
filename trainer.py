@@ -14,21 +14,27 @@ from torch.nn.modules.loss import CrossEntropyLoss
 from torch.utils.data import DataLoader
 import torch.nn.functional as F
 from tqdm import tqdm
-from utils import DiceLoss, Focal_loss
+from utils_hm import DiceLoss, FocalLoss
 from torchvision import transforms
 from icecream import ic
 
 
-def calc_loss(outputs, coarse_mask, low_res_label_batch, ce_loss, dice_loss, hint_loss, dice_weight:float=0.8):
+def calc_loss(outputs, coarse_mask, low_res_label_batch, bce_loss, focal_loss, focal_weight:float=0.8):
     low_res_logits = outputs['low_res_logits']
-    loss_ce = ce_loss(low_res_logits, low_res_label_batch[:].long())
-    loss_dice = dice_loss(low_res_logits, low_res_label_batch, softmax=True)
+    # loss_ce = ce_loss(low_res_logits, low_res_label_batch[:].long())
+    pred_mask = torch.sigmoid(low_res_logits).squeeze()
+    loss_bce = bce_loss(pred_mask, low_res_label_batch.float())
+
+    # loss_dice = dice_loss(low_res_logits, low_res_label_batch, softmax=True)
+    loss_focal = focal_loss(pred_mask, low_res_label_batch.float())
 
     pred_hint = torch.sigmoid(coarse_mask).squeeze()
-    loss_hint = hint_loss(pred_hint, low_res_label_batch.float())
+    loss_hint_bce = bce_loss(pred_hint, low_res_label_batch.float())
+    loss_hint_focal = focal_loss(pred_hint, low_res_label_batch.float())
 
-    loss = (1 - dice_weight) * loss_ce + dice_weight * loss_dice + loss_hint
-    return loss, loss_ce, loss_dice, loss_hint
+    loss = (1 - focal_weight) * loss_bce + focal_weight * loss_focal + (1 - focal_weight) * loss_hint_bce + focal_weight * loss_hint_focal
+    # loss = loss_bce + loss_hint
+    return loss, loss_bce, loss_focal, loss_hint_bce, loss_hint_focal
 
 
 def trainer_synapse(args, model, snapshot_path, multimask_output, low_res):
@@ -54,9 +60,11 @@ def trainer_synapse(args, model, snapshot_path, multimask_output, low_res):
     if args.n_gpu > 1:
         model = nn.DataParallel(model)
     model.train()
-    ce_loss = CrossEntropyLoss()
-    dice_loss = DiceLoss(num_classes + 1)
-    hint_loss = nn.BCELoss()
+    # ce_loss = CrossEntropyLoss()
+    bce_loss = nn.BCELoss()
+    focal_loss = FocalLoss()
+    # dice_loss = DiceLoss()
+    # hint_loss = nn.BCELoss()
     if args.warmup:
         b_lr = base_lr / args.warmup_period
     else:
@@ -81,7 +89,7 @@ def trainer_synapse(args, model, snapshot_path, multimask_output, low_res):
             low_res_label_batch = low_res_label_batch.cuda()
             assert image_batch.max() <= 3, f'image_batch max: {image_batch.max()}'
             outputs, coarse_mask = model(image_batch, multimask_output, args.img_size)
-            loss, loss_ce, loss_dice, loss_hint = calc_loss(outputs, coarse_mask, low_res_label_batch, ce_loss, dice_loss, hint_loss, args.dice_param)
+            loss, loss_bce, loss_focal, loss_hint_bce, loss_hint_focal = calc_loss(outputs, coarse_mask, low_res_label_batch, bce_loss, focal_loss, args.dice_param)
             optimizer.zero_grad()
             loss.backward()
             optimizer.step()
@@ -102,11 +110,12 @@ def trainer_synapse(args, model, snapshot_path, multimask_output, low_res):
             iter_num = iter_num + 1
             writer.add_scalar('info/lr', lr_, iter_num)
             writer.add_scalar('info/total_loss', loss, iter_num)
-            writer.add_scalar('info/loss_ce', loss_ce, iter_num)
-            writer.add_scalar('info/loss_dice', loss_dice, iter_num)
-            writer.add_scalar('info/loss_hint', loss_hint, iter_num)
+            writer.add_scalar('info/loss_bce', loss_bce, iter_num)
+            writer.add_scalar('info/loss_focal', loss_focal, iter_num)
+            writer.add_scalar('info/loss_hint_bce', loss_hint_bce, iter_num)
+            writer.add_scalar('info/loss_hint_focal', loss_hint_focal, iter_num)
 
-            logging.info('iteration %d : loss : %f, loss_ce: %f, loss_dice: %f, loss_hint: %f' % (iter_num, loss.item(), loss_ce.item(), loss_dice.item(), loss_hint.item()))
+            logging.info('iteration %d : loss : %f, loss_bce: %f, loss_focal: %f, loss_hint_bce: %f, loss_hint_focal: %f' % (iter_num, loss.item(), loss_bce.item(), loss_focal.item(), loss_hint_bce.item(), loss_hint_focal.item()))
 
             if iter_num % 20 == 0:
                 image = image_batch[1, 0:1, :, :]
