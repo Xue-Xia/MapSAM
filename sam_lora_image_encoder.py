@@ -131,6 +131,7 @@ class LoRA_Sam(nn.Module):
         prompt_encoder_tensors = {}
         mask_decoder_tensors = {}
         spgen_tensors = {}
+        mask_head_tensors = {}
 
         # save prompt encoder, only `state_dict`, the `named_parameter` is not permitted
         if isinstance(self.sam, torch.nn.DataParallel) or isinstance(self.sam, torch.nn.parallel.DistributedDataParallel):
@@ -144,8 +145,10 @@ class LoRA_Sam(nn.Module):
                 mask_decoder_tensors[key] = value
             if 'spgen' in key:
                 spgen_tensors[key] = value
+            if 'mask_head' in key:
+                mask_head_tensors[key] = value
 
-        merged_dict = {**a_tensors, **b_tensors, **spgen_tensors, **prompt_encoder_tensors, **mask_decoder_tensors}
+        merged_dict = {**a_tensors, **b_tensors, **spgen_tensors, **prompt_encoder_tensors, **mask_decoder_tensors, **mask_head_tensors}
         torch.save(merged_dict, filename)
 
     def load_lora_parameters(self, filename: str) -> None:
@@ -190,6 +193,13 @@ class LoRA_Sam(nn.Module):
         mask_decoder_values = [state_dict[k] for k in mask_decoder_keys]
         mask_decoder_new_state_dict = {k: v for k, v in zip(mask_decoder_keys, mask_decoder_values)}
         sam_dict.update(mask_decoder_new_state_dict)
+
+        # load mask head
+        mask_head_keys = [k for k in sam_keys if 'mask_head' in k]
+        mask_head_values = [state_dict[k] for k in mask_head_keys]
+        mask_head_new_state_dict = {k: v for k, v in zip(mask_head_keys, mask_head_values)}
+        sam_dict.update(mask_head_new_state_dict)
+
         self.sam.load_state_dict(sam_dict)
 
     def reset_parameters(self) -> None:
