@@ -8,6 +8,7 @@ import torch
 from torch import nn
 from torch.nn import functional as F
 from icecream import ic
+from .common import LayerNorm2d
 
 from typing import Any, Dict, List, Tuple
 
@@ -15,6 +16,39 @@ from .image_encoder import ImageEncoderViT
 from .mask_decoder import MaskDecoder
 from .prompt_encoder import PromptEncoder
 
+def point_selection(mask, topk=1):
+    # Top-1 point selection
+    w, h = mask.shape
+    topk_xy = mask.flatten(0).topk(topk)[1]
+    topk_x = (topk_xy // h).unsqueeze(0)
+    topk_y = (topk_xy - topk_x * h)
+    topk_xy = torch.cat((topk_y, topk_x), dim=0).permute(1, 0)
+    topk_label = torch.tensor([1] * topk, device=mask.device)
+
+    # Top-last point selection
+    last_xy = mask.flatten(0).topk(topk, largest=False)[1]
+    last_x = (last_xy // h).unsqueeze(0)
+    last_y = (last_xy - last_x * h)
+    last_xy = torch.cat((last_y, last_x), dim=0).permute(1, 0)
+    last_label = torch.tensor([0] * topk, device=mask.device)
+
+    return topk_xy, topk_label, last_xy, last_label
+
+class SPGen(nn.Module):
+    def __init__(self):
+        super(SPGen, self).__init__()
+
+        self.hint = nn.Sequential(nn.Conv2d(256, 64, kernel_size=1, stride=1),
+                                 LayerNorm2d(64),
+                                 nn.GELU(),
+                                 nn.Conv2d(64, 16, kernel_size=1, stride=1),
+                                 LayerNorm2d(16),
+                                 nn.GELU(),
+                                 nn.Conv2d(16, 1, kernel_size=1))
+
+    def forward(self, x):
+        x = self.hint(x)
+        return x
 
 class Sam(nn.Module):
     mask_threshold: float = 0.0
@@ -42,6 +76,7 @@ class Sam(nn.Module):
         """
         super().__init__()
         self.image_encoder = image_encoder
+        self.spgen = SPGen()
         self.prompt_encoder = prompt_encoder
         self.mask_decoder = mask_decoder
         self.register_buffer("pixel_mean", torch.Tensor(pixel_mean).view(-1, 1, 1), False)
@@ -61,27 +96,52 @@ class Sam(nn.Module):
     def forward_train(self, batched_input, multimask_output, image_size):
         input_images = self.preprocess(batched_input)
         image_embeddings = self.image_encoder(input_images)
-        sparse_embeddings, dense_embeddings = self.prompt_encoder(
-            points=None, boxes=None, masks=None
-        )
-        low_res_masks, iou_predictions = self.mask_decoder(
-            image_embeddings=image_embeddings,
-            image_pe=self.prompt_encoder.get_dense_pe(),
-            sparse_prompt_embeddings=sparse_embeddings,
-            dense_prompt_embeddings=dense_embeddings,
-            multimask_output=multimask_output
-        )
-        masks = self.postprocess_masks(
-            low_res_masks,
-            input_size=(image_size, image_size),
-            original_size=(image_size, image_size)
-        )
+        coarse_mask = self.spgen(image_embeddings)
+        coarse_mask_up4 = F.interpolate(coarse_mask, size=(int(image_size/4), int(image_size/4)), mode="bilinear")
+        coarse_mask_up16 = F.interpolate(coarse_mask, size=(image_size, image_size), mode="bilinear")
+
+        spgen_prob = torch.sigmoid(coarse_mask_up4.detach())
+        spgen_prob[spgen_prob >= 0.2] = 1
+        spgen_prob[spgen_prob < 0.2] = 0
+
         outputs = {
-            'masks': masks,
-            'iou_predictions': iou_predictions,
-            'low_res_logits': low_res_masks
+            'masks': [],
+            'iou_predictions': [],
+            'low_res_logits': []
         }
-        return outputs
+
+        for idx in range(batched_input.shape[0]):  # for each batch
+
+            # Positive-negative location prior
+            topk_xy_i, topk_label_i, last_xy_i, last_label_i = point_selection(coarse_mask_up16[idx].squeeze(0), topk=2)
+            topk_xy = torch.cat([topk_xy_i, last_xy_i], dim=0)
+            topk_label = torch.cat([topk_label_i, last_label_i], dim=0)
+            fg_points = (topk_xy.unsqueeze(0), topk_label.unsqueeze(0))
+
+            sparse_embeddings, dense_embeddings = self.prompt_encoder(
+                points=fg_points, boxes=None, masks=None
+            )
+            low_res_masks, iou_predictions = self.mask_decoder(
+                image_embeddings=image_embeddings[idx].unsqueeze(0),
+                image_pe=self.prompt_encoder.get_dense_pe(),
+                sparse_prompt_embeddings=sparse_embeddings,
+                dense_prompt_embeddings=dense_embeddings,
+                multimask_output=multimask_output
+            )
+            masks = self.postprocess_masks(
+                low_res_masks,
+                input_size=(image_size, image_size),
+                original_size=(image_size, image_size)
+            )
+            outputs['masks'].append(masks)
+            outputs['iou_predictions'].append(iou_predictions)
+            outputs['low_res_logits'].append(low_res_masks)
+
+        outputs['masks'] = torch.stack(outputs['masks'], dim=0).squeeze(1)
+        outputs['iou_predictions'] = torch.stack(outputs['iou_predictions'], dim=0).squeeze(1)
+        outputs['low_res_logits'] = torch.stack(outputs['low_res_logits'], dim=0).squeeze(1)
+
+        return outputs, coarse_mask_up4
 
     @torch.no_grad()
     def forward_test(

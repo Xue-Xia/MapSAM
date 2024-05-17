@@ -18,13 +18,59 @@ from utils import DiceLoss, Focal_loss
 from torchvision import transforms
 from icecream import ic
 
+def dice_loss(logits, target, smooth=1e-6):
+    # Convert logits to probabilities using sigmoid
+    probs = torch.sigmoid(logits)
 
-def calc_loss(outputs, low_res_label_batch, ce_loss, dice_loss, dice_weight:float=0.8):
+    # Flatten logits and target tensors
+    flat_logits = probs.view(logits.size(0), -1)
+    flat_target = target.view(target.size(0), -1)
+
+    # Compute intersection and sums
+    intersection = torch.sum(flat_logits * flat_target, dim=1)
+    sum_logits = torch.sum(flat_logits, dim=1)
+    sum_target = torch.sum(flat_target, dim=1)
+
+    # Compute Dice coefficient
+    dice_coeff = (2. * intersection + smooth) / (sum_logits + sum_target + smooth)
+
+    # Compute Dice loss
+    dice_loss = 1. - dice_coeff
+
+    # Average Dice loss over the batch
+    return torch.mean(dice_loss)
+
+
+def focal_loss(prediction, target, alpha=0.25, gamma=2, smooth=1e-6):
+    # Apply sigmoid to convert logits to probabilities
+    probs = torch.sigmoid(prediction)
+
+    # Compute the binary cross-entropy loss
+    bce_loss = F.binary_cross_entropy_with_logits(prediction, target.float(), reduction='none')
+
+    # Compute the modulating factor (1 - p_t)^gamma
+    modulating_factor = (1 - probs).pow(gamma)
+
+    # Compute the focal loss
+    focal_loss = alpha * modulating_factor * bce_loss
+
+    # Smooth the loss to avoid numerical instability
+    smooth_loss = -torch.log(1.0 - bce_loss + smooth)
+
+    # Weighted combination of focal loss and smooth loss
+    loss = torch.mean(focal_loss + smooth_loss)
+
+    return loss
+
+def calc_loss(outputs, coarse_mask, low_res_label_batch, ce_loss, dice_loss, bce_loss, dice_weight:float=0.8):
     low_res_logits = outputs['low_res_logits']
     loss_ce = ce_loss(low_res_logits, low_res_label_batch[:].long())
     loss_dice = dice_loss(low_res_logits, low_res_label_batch, softmax=True)
-    loss = (1 - dice_weight) * loss_ce + dice_weight * loss_dice
-    return loss, loss_ce, loss_dice
+
+    loss_hint = bce_loss(torch.sigmoid(coarse_mask), low_res_label_batch.unsqueeze(1).float())
+
+    loss = (1 - dice_weight) * loss_ce + dice_weight * loss_dice + loss_hint
+    return loss, loss_ce, loss_dice, loss_hint
 
 
 def trainer_synapse(args, model, snapshot_path, multimask_output, low_res):
@@ -51,7 +97,9 @@ def trainer_synapse(args, model, snapshot_path, multimask_output, low_res):
         model = nn.DataParallel(model)
     model.train()
     ce_loss = CrossEntropyLoss()
-    dice_loss = DiceLoss(num_classes + 1)
+    dice_loss = DiceLoss(num_classes+1)
+    bce_loss = nn.BCELoss()
+
     if args.warmup:
         b_lr = base_lr / args.warmup_period
     else:
@@ -75,8 +123,18 @@ def trainer_synapse(args, model, snapshot_path, multimask_output, low_res):
             image_batch, label_batch = image_batch.cuda(), label_batch.cuda()
             low_res_label_batch = low_res_label_batch.cuda()
             assert image_batch.max() <= 3, f'image_batch max: {image_batch.max()}'
-            outputs = model(image_batch, multimask_output, args.img_size)
-            loss, loss_ce, loss_dice = calc_loss(outputs, low_res_label_batch, ce_loss, dice_loss, args.dice_param)
+            outputs, coarse_mask = model(image_batch, multimask_output, args.img_size)
+            loss, loss_ce, loss_dice,loss_hint = calc_loss(outputs, coarse_mask, low_res_label_batch, ce_loss, dice_loss, bce_loss, args.dice_param)
+
+            # dice_weight = args.dice_param
+            #
+            # input = outputs['low_res_logits']
+            # target = low_res_label_batch.unsqueeze(1)
+            #
+            # loss_focal = focal_loss(input, target)
+            # loss_dice = dice_loss(input, target)
+            # loss = (1 - dice_weight) * loss_focal + dice_weight * loss_dice
+
             optimizer.zero_grad()
             loss.backward()
             optimizer.step()
@@ -99,8 +157,9 @@ def trainer_synapse(args, model, snapshot_path, multimask_output, low_res):
             writer.add_scalar('info/total_loss', loss, iter_num)
             writer.add_scalar('info/loss_ce', loss_ce, iter_num)
             writer.add_scalar('info/loss_dice', loss_dice, iter_num)
+            writer.add_scalar('info/loss_hint', loss_hint, iter_num)
 
-            logging.info('iteration %d : loss : %f, loss_ce: %f, loss_dice: %f' % (iter_num, loss.item(), loss_ce.item(), loss_dice.item()))
+            logging.info('iteration %d : loss : %f, loss_ce: %f, loss_dice: %f, loss_hint: %f' % (iter_num, loss.item(), loss_ce.item(), loss_dice.item(), loss_hint.item()))
 
             if iter_num % 20 == 0:
                 image = image_batch[1, 0:1, :, :]

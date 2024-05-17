@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/.idea/SAMed.iml" filepath="$PROJECT_DIR$/.idea/SAMed.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/MapSAM.iml" filepath="$PROJECT_DIR$/.idea/MapSAM.iml" />
     </modules>
   </component>
 </project>

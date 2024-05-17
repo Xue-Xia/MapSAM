@@ -2,6 +2,10 @@ python train.py --root_path data/dataset_hm/partial_1 --output result/ --warmup 
 
 python test.py --is_savenii --volume_path data/dataset_hm --output_dir result/ --num_classes 1 --lora_ckpt checkpoints/epoch_159.pth
 
+10shot
+Testing performance in best val model: mean_dice : 0.846210 mean_hd95 : 27.794686
+mIoU: 0.754383105373541
+
 partial1
 Testing performance in best val model: mean_dice : 0.917539 mean_hd95 : 6.191715
 Testing Finished!
@@ -16,4 +20,24 @@ full
 Testing performance in best val model: mean_dice : 0.919842 mean_hd95 : 17.782196
 Testing Finished!
 mIoU: 0.8630961354399227
+
+Dora 10shot
+Testing performance in best val model: mean_dice : 0.833716 mean_hd95 : 43.243969 rank4
+Testing performance in best val model: mean_dice : 0.789056 mean_hd95 : 27.384993 rank2
+Testing performance in best val model: mean_dice : 0.774790 mean_hd95 : 26.943708 r4 + points
+mIoU: 0.7342937329833412 rank4
+mIoU: 0.6903321110501123 rank2
+mIoU: 0.6582634030893979 r4 + points
+
+Dora partial1
+Testing performance in best val model: mean_dice : 0.890210 mean_hd95 : 6.175205
+mIoU: 0.8209048208099076
+
+Dora partial10
+Testing performance in best val model: mean_dice : 0.930656 mean_hd95 : 5.517115
+mIoU: 0.8790127021174379
+
+Dora full
+Testing performance in best val model: mean_dice : 0.914231 mean_hd95 : 17.173892
+mIoU: 0.8543722326558837
 
