@@ -2,18 +2,11 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="760b60c1-10e6-4e1c-be87-a7ebcde59589" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/.idea/MapSAM.iml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/.gitignore" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/SAMed.iml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/inspectionProfiles/Project_Default.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/modules.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/modules.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/arg.txt" beforeDir="false" afterPath="$PROJECT_DIR$/arg.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/eval.py" beforeDir="false" afterPath="$PROJECT_DIR$/eval.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/segment_anything/modeling/mask_decoder.py" beforeDir="false" afterPath="$PROJECT_DIR$/segment_anything/modeling/mask_decoder.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/segment_anything/modeling/sam.py" beforeDir="false" afterPath="$PROJECT_DIR$/segment_anything/modeling/sam.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/test.py" beforeDir="false" afterPath="$PROJECT_DIR$/test.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/train.py" beforeDir="false" afterPath="$PROJECT_DIR$/train.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/trainer.py" beforeDir="false" afterPath="$PROJECT_DIR$/trainer.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/utils_hm.py" beforeDir="false" afterPath="$PROJECT_DIR$/utils_hm.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/segment_anything/modeling/transformer.py" beforeDir="false" afterPath="$PROJECT_DIR$/segment_anything/modeling/transformer.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -39,7 +32,7 @@
     "last_opened_file_path": "/local/home/xiaxue/Downloads/MapSAM/test.py"
   }
 }]]></component>
-  <component name="RunManager" selected="Python.train">
+  <component name="RunManager" selected="Python.eval">
     <configuration name="eval" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
       <module name="MapSAM" />
       <option name="INTERPRETER_OPTIONS" value="" />
@@ -135,5 +128,26 @@
         </entry>
       </map>
     </option>
+  </component>
+  <component name="XDebuggerManager">
+    <breakpoint-manager>
+      <breakpoints>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/segment_anything/modeling/transformer.py</url>
+          <line>104</line>
+          <option name="timeStamp" value="8" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/segment_anything/modeling/mask_decoder.py</url>
+          <line>129</line>
+          <option name="timeStamp" value="9" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/segment_anything/modeling/sam.py</url>
+          <line>128</line>
+          <option name="timeStamp" value="13" />
+        </line-breakpoint>
+      </breakpoints>
+    </breakpoint-manager>
   </component>
 </project>

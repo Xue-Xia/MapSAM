@@ -100,9 +100,9 @@ class Sam(nn.Module):
         coarse_mask_up4 = F.interpolate(coarse_mask, size=(int(image_size/4), int(image_size/4)), mode="bilinear")
         coarse_mask_up16 = F.interpolate(coarse_mask, size=(image_size, image_size), mode="bilinear")
 
-        spgen_prob = torch.sigmoid(coarse_mask_up4.detach())
-        spgen_prob[spgen_prob >= 0.2] = 1
-        spgen_prob[spgen_prob < 0.2] = 0
+        spgen_prob = torch.sigmoid(coarse_mask.detach())
+        # spgen_prob[spgen_prob >= 0.5] = 1
+        # spgen_prob[spgen_prob < 0.5] = 0
 
         outputs = {
             'masks': [],
@@ -118,6 +118,14 @@ class Sam(nn.Module):
             topk_label = torch.cat([topk_label_i, last_label_i], dim=0)
             fg_points = (topk_xy.unsqueeze(0), topk_label.unsqueeze(0))
 
+            #get target semantic
+            image_feat = image_embeddings[idx].permute(1, 2, 0).detach()
+            target_feat = image_feat[spgen_prob[idx].squeeze() > 0.5]
+            target_embedding = target_feat.mean(0).unsqueeze(0).unsqueeze(0)
+
+            if torch.isnan(target_embedding).any():
+                target_embedding = None
+
             sparse_embeddings, dense_embeddings = self.prompt_encoder(
                 points=fg_points, boxes=None, masks=None
             )
@@ -126,7 +134,8 @@ class Sam(nn.Module):
                 image_pe=self.prompt_encoder.get_dense_pe(),
                 sparse_prompt_embeddings=sparse_embeddings,
                 dense_prompt_embeddings=dense_embeddings,
-                multimask_output=multimask_output
+                multimask_output=multimask_output,
+                target_embedding=target_embedding
             )
             masks = self.postprocess_masks(
                 low_res_masks,
