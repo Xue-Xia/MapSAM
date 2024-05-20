@@ -77,6 +77,11 @@ class Sam(nn.Module):
         super().__init__()
         self.image_encoder = image_encoder
         self.spgen = SPGen()
+
+        self.spgen1 = SPGen()
+        self.spgen2 = SPGen()
+        self.spgen3 = SPGen()
+
         self.prompt_encoder = prompt_encoder
         self.mask_decoder = mask_decoder
         self.register_buffer("pixel_mean", torch.Tensor(pixel_mean).view(-1, 1, 1), False)
@@ -95,8 +100,14 @@ class Sam(nn.Module):
 
     def forward_train(self, batched_input, multimask_output, image_size):
         input_images = self.preprocess(batched_input)
-        image_embeddings = self.image_encoder(input_images)
-        coarse_mask = self.spgen(image_embeddings)
+        image_embeddings, stored_states = self.image_encoder(input_images)
+
+        coarse_mask0 = self.spgen(image_embeddings)
+        coarse_mask1 = self.spgen1(stored_states[0])
+        coarse_mask2 = self.spgen2(stored_states[1])
+        coarse_mask3 = self.spgen3(stored_states[2])
+        coarse_mask = torch.mean(torch.stack([coarse_mask0, coarse_mask1, coarse_mask2, coarse_mask3], dim=0), dim=0)
+
         coarse_mask_up4 = F.interpolate(coarse_mask, size=(int(image_size/4), int(image_size/4)), mode="bilinear")
         coarse_mask_up16 = F.interpolate(coarse_mask, size=(image_size, image_size), mode="bilinear")
 
@@ -111,6 +122,13 @@ class Sam(nn.Module):
         }
 
         for idx in range(batched_input.shape[0]):  # for each batch
+
+            # Obtain the target guidance for cross-attention layers
+            attn_mask = (coarse_mask[idx].sigmoid().unsqueeze(0).unsqueeze(0).flatten(3) <0.5).bool()
+            new_attn_mask = torch.zeros_like(attn_mask, dtype=torch.float)
+            new_attn_mask.masked_fill_(attn_mask, -1e9)
+            attn_mask = new_attn_mask
+            attn_mask = attn_mask.detach()
 
             # Positive-negative location prior
             topk_xy_i, topk_label_i, last_xy_i, last_label_i = point_selection(coarse_mask_up16[idx].squeeze(0), topk=2)
@@ -135,6 +153,7 @@ class Sam(nn.Module):
                 sparse_prompt_embeddings=sparse_embeddings,
                 dense_prompt_embeddings=dense_embeddings,
                 multimask_output=multimask_output,
+                attn_mask=attn_mask,
                 target_embedding=target_embedding
             )
             masks = self.postprocess_masks(

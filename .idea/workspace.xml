@@ -4,6 +4,7 @@
     <list default="true" id="760b60c1-10e6-4e1c-be87-a7ebcde59589" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/arg.txt" beforeDir="false" afterPath="$PROJECT_DIR$/arg.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/segment_anything/modeling/image_encoder.py" beforeDir="false" afterPath="$PROJECT_DIR$/segment_anything/modeling/image_encoder.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/segment_anything/modeling/mask_decoder.py" beforeDir="false" afterPath="$PROJECT_DIR$/segment_anything/modeling/mask_decoder.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/segment_anything/modeling/sam.py" beforeDir="false" afterPath="$PROJECT_DIR$/segment_anything/modeling/sam.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/segment_anything/modeling/transformer.py" beforeDir="false" afterPath="$PROJECT_DIR$/segment_anything/modeling/transformer.py" afterDir="false" />
@@ -24,15 +25,15 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "RunOnceActivity.OpenProjectViewOnStart": "true",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "SHARE_PROJECT_CONFIGURATION_FILES": "true",
-    "last_opened_file_path": "/local/home/xiaxue/Downloads/MapSAM/test.py"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;SHARE_PROJECT_CONFIGURATION_FILES&quot;: &quot;true&quot;,
+    &quot;last_opened_file_path&quot;: &quot;/local/home/xiaxue/Downloads/MapSAM/test.py&quot;
   }
-}]]></component>
-  <component name="RunManager" selected="Python.eval">
+}</component>
+  <component name="RunManager" selected="Python.train">
     <configuration name="eval" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
       <module name="MapSAM" />
       <option name="INTERPRETER_OPTIONS" value="" />
@@ -134,18 +135,8 @@
       <breakpoints>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/segment_anything/modeling/transformer.py</url>
-          <line>104</line>
-          <option name="timeStamp" value="8" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/segment_anything/modeling/mask_decoder.py</url>
-          <line>129</line>
-          <option name="timeStamp" value="9" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/segment_anything/modeling/sam.py</url>
-          <line>128</line>
-          <option name="timeStamp" value="13" />
+          <line>123</line>
+          <option name="timeStamp" value="21" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>
