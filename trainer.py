@@ -41,26 +41,34 @@ def dice_loss(logits, target, smooth=1e-6):
     return torch.mean(dice_loss)
 
 
-def focal_loss(prediction, target, alpha=0.25, gamma=2, smooth=1e-6):
-    # Apply sigmoid to convert logits to probabilities
-    probs = torch.sigmoid(prediction)
+def focal_loss(inputs, targets, alpha=0.25, gamma=2):
+    """
+        Loss used in RetinaNet for dense detection: https://arxiv.org/abs/1708.02002.
+        Args:
+            inputs: A float tensor of arbitrary shape.
+                    The predictions for each example.
+            targets: A float tensor with the same shape as inputs. Stores the binary
+                     classification label for each element in inputs
+                    (0 for the negative class and 1 for the positive class).
+            alpha: (optional) Weighting factor in range (0,1) to balance
+                    positive vs negative examples. Default = -1 (no weighting).
+            gamma: Exponent of the modulating factor (1 - p_t) to
+                   balance easy vs hard examples.
+        Returns:
+            Loss tensor
+        """
+    inputs = inputs.flatten(1)
+    prob = inputs.sigmoid()
+    targets = targets.float().flatten(1)
+    ce_loss = F.binary_cross_entropy_with_logits(inputs, targets, reduction="none")
+    p_t = prob * targets + (1 - prob) * (1 - targets)
+    loss = ce_loss * ((1 - p_t) ** gamma)
 
-    # Compute the binary cross-entropy loss
-    bce_loss = F.binary_cross_entropy_with_logits(prediction, target.float(), reduction='none')
+    if alpha >= 0:
+        alpha_t = alpha * targets + (1 - alpha) * (1 - targets)
+        loss = alpha_t * loss
 
-    # Compute the modulating factor (1 - p_t)^gamma
-    modulating_factor = (1 - probs).pow(gamma)
-
-    # Compute the focal loss
-    focal_loss = alpha * modulating_factor * bce_loss
-
-    # Smooth the loss to avoid numerical instability
-    smooth_loss = -torch.log(1.0 - bce_loss + smooth)
-
-    # Weighted combination of focal loss and smooth loss
-    loss = torch.mean(focal_loss + smooth_loss)
-
-    return loss
+    return loss.mean(1).mean()
 
 def calc_loss(outputs, coarse_mask, low_res_label_batch, ce_loss, dice_loss, bce_loss, dice_weight:float=0.8):
     low_res_logits = outputs['low_res_logits']
@@ -96,9 +104,9 @@ def trainer_synapse(args, model, snapshot_path, multimask_output, low_res):
     if args.n_gpu > 1:
         model = nn.DataParallel(model)
     model.train()
-    ce_loss = CrossEntropyLoss()
-    dice_loss = DiceLoss(num_classes+1)
-    bce_loss = nn.BCELoss()
+    # ce_loss = CrossEntropyLoss()
+    # dice_loss = DiceLoss(num_classes+1)
+    # bce_loss = nn.BCELoss()
 
     if args.warmup:
         b_lr = base_lr / args.warmup_period
@@ -124,16 +132,20 @@ def trainer_synapse(args, model, snapshot_path, multimask_output, low_res):
             low_res_label_batch = low_res_label_batch.cuda()
             assert image_batch.max() <= 3, f'image_batch max: {image_batch.max()}'
             outputs, coarse_mask = model(image_batch, multimask_output, args.img_size)
-            loss, loss_ce, loss_dice,loss_hint = calc_loss(outputs, coarse_mask, low_res_label_batch, ce_loss, dice_loss, bce_loss, args.dice_param)
+            # loss, loss_ce, loss_dice,loss_hint = calc_loss(outputs, coarse_mask, low_res_label_batch, ce_loss, dice_loss, bce_loss, args.dice_param)
 
-            # dice_weight = args.dice_param
-            #
-            # input = outputs['low_res_logits']
-            # target = low_res_label_batch.unsqueeze(1)
-            #
-            # loss_focal = focal_loss(input, target)
-            # loss_dice = dice_loss(input, target)
-            # loss = (1 - dice_weight) * loss_focal + dice_weight * loss_dice
+            dice_weight = args.dice_param
+
+            input = outputs['low_res_logits']
+            target = low_res_label_batch.unsqueeze(1)
+
+            loss_focal = focal_loss(input, target)
+            loss_dice = dice_loss(input, target)
+
+            loss_focal_hint = focal_loss(coarse_mask, target)
+            loss_dice_hint = dice_loss(coarse_mask, target)
+
+            loss = (1 - dice_weight) * loss_focal + dice_weight * loss_dice + (1 - dice_weight) * loss_focal_hint + dice_weight * loss_dice_hint
 
             optimizer.zero_grad()
             loss.backward()
@@ -155,11 +167,12 @@ def trainer_synapse(args, model, snapshot_path, multimask_output, low_res):
             iter_num = iter_num + 1
             writer.add_scalar('info/lr', lr_, iter_num)
             writer.add_scalar('info/total_loss', loss, iter_num)
-            writer.add_scalar('info/loss_ce', loss_ce, iter_num)
+            writer.add_scalar('info/loss_focal', loss_focal, iter_num)
             writer.add_scalar('info/loss_dice', loss_dice, iter_num)
-            writer.add_scalar('info/loss_hint', loss_hint, iter_num)
+            writer.add_scalar('info/loss_focal_hint', loss_focal_hint, iter_num)
+            writer.add_scalar('info/loss_dice_hint', loss_dice_hint, iter_num)
 
-            logging.info('iteration %d : loss : %f, loss_ce: %f, loss_dice: %f, loss_hint: %f' % (iter_num, loss.item(), loss_ce.item(), loss_dice.item(), loss_hint.item()))
+            logging.info('iteration %d : loss : %f, loss_focal: %f, loss_dice: %f, loss_focal_hint: %f, loss_dice_hint: %f' % (iter_num, loss.item(), loss_focal.item(), loss_dice.item(), loss_focal_hint.item(), loss_dice_hint.item()))
 
             if iter_num % 20 == 0:
                 image = image_batch[1, 0:1, :, :]

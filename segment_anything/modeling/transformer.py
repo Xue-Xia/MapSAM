@@ -116,12 +116,12 @@ class TwoWayTransformer(nn.Module):
     def forward_mask_head(self, q, k, image_pe):
         q = self.norm_final_attn(q)
         k = k + image_pe
-        mask_tokens_out = q[:, 1:3, :]
+        mask_tokens_out = q[:, 1, :]
         mask = mask_tokens_out @ k.permute(0, 2, 1)
-        mask = torch.argmax(torch.softmax(mask, dim=1), dim=1).unsqueeze(0).unsqueeze(0)
+        # mask = torch.argmax(torch.softmax(mask, dim=1), dim=1).unsqueeze(0).unsqueeze(0)
+        # attn_mask = (mask < 0.5).bool()
+        attn_mask = (mask.sigmoid().unsqueeze(0) < 0.5).bool()
 
-        # attn_mask = (mask.sigmoid().unsqueeze(0) < 0.5).bool()
-        attn_mask = (mask < 0.5).bool()
         new_attn_mask = torch.zeros_like(attn_mask, dtype=torch.float)
         new_attn_mask.masked_fill_(attn_mask, -1e9)
         attn_mask = new_attn_mask

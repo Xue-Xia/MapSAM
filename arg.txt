@@ -1,4 +1,4 @@
-python train.py --root_path data/dataset_hm/partial_1 --output result/ --warmup --AdamW --n_gpu 1 --batch_size 8 --max_epochs 200 --num_classes 1
+python train.py --root_path data/dataset_hm/partial_1 --output result/ --warmup --AdamW --n_gpu 1 --batch_size 8 --num_classes 1
 
 python test.py --is_savenii --volume_path data/dataset_hm --output_dir result/ --num_classes 1 --lora_ckpt checkpoints/epoch_159.pth
 

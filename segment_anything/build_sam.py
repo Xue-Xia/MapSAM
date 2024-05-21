@@ -108,7 +108,7 @@ def _build_sam(
         ),
         mask_decoder=MaskDecoder(
             # num_multimask_outputs=3,
-            num_multimask_outputs=num_classes,
+            num_multimask_outputs=num_classes - 1,
             transformer=TwoWayTransformer(
                 depth=2,
                 embedding_dim=prompt_embed_dim,

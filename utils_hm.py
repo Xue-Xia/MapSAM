@@ -129,7 +129,8 @@ def test_single_volume(image, label, net, classes, multimask_output, patch_size=
         with torch.no_grad():
             outputs, coarse_mask = net(inputs, multimask_output, patch_size[0])
             output_masks = outputs['masks']
-            out = torch.argmax(torch.softmax(output_masks, dim=1), dim=1).squeeze(0)
+            # out = torch.argmax(torch.softmax(output_masks, dim=1), dim=1).squeeze(0)
+            out = (torch.sigmoid(output_masks).squeeze() > 0.5).int()
             out = out.cpu().detach().numpy()
             out_h, out_w = out.shape
             if x != out_h or y != out_w:
