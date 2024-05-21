@@ -154,7 +154,7 @@ class Sam(nn.Module):
                 dense_prompt_embeddings=dense_embeddings,
                 multimask_output=multimask_output,
                 attn_mask=attn_mask,
-                target_embedding=target_embedding
+                target_embedding=None
             )
             masks = self.postprocess_masks(
                 low_res_masks,

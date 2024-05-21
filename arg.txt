@@ -39,11 +39,15 @@ Testing performance in best val model: mean_dice : 0.900185 mean_hd95 : 24.81605
 Testing performance in best val model: mean_dice : 0.892660 mean_hd95 : 28.576228 top1point
 Testing performance in best val model: mean_dice : 0.901648 mean_hd95 : 27.047914 top2points + target embedding
 Testing performance in best val model: mean_dice : 0.918618 mean_hd95 : 16.926396 top2points + target embedding + multifeature
+Testing performance in best val model: mean_dice : 0.922921 mean_hd95 : 16.418139 top2points + target embedding + multifeature + masked attention
+Testing performance in best val model: mean_dice : 0.912744 mean_hd95 : 20.695663 top2points + multifeature + masked attention
 mIoU: 0.8790127021174379
 mIoU: 0.8334575356362215 top2points
 mIoU: 0.8230953211541069 top1point
 mIoU: 0.8346583917883578 top2points + target embedding
 mIoU: 0.8608989279547717 top2points + target embedding + multifeature
+mIoU: 0.8666055690137558 top2points + target embedding + multifeature + masked attention
+mIoU: 0.8524799091466213 top2points + multifeature + masked attention
 
 Dora full
 Testing performance in best val model: mean_dice : 0.914231 mean_hd95 : 17.173892
