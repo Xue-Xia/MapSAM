@@ -53,3 +53,20 @@ Dora full
 Testing performance in best val model: mean_dice : 0.914231 mean_hd95 : 17.173892
 mIoU: 0.8543722326558837
 
+Dora partial1
+Mean class 1 name spleen mean_dice 0.919842 mean_hd95 9.016571
+Testing performance in best val model: mean_dice : 0.919842 mean_hd95 : 9.016571
+Testing Finished!
+mIoU: 0.8651764807737851
+
+Dora partial1 lr 0.01
+Mean class 1 name spleen mean_dice 0.918820 mean_hd95 6.836441
+Testing performance in best val model: mean_dice : 0.918820 mean_hd95 : 6.836441
+Testing Finished!
+mIoU: 0.8611919664941644
+
+Dora partial10
+Mean class 1 name spleen mean_dice 0.935651 mean_hd95 4.634082
+Testing performance in best val model: mean_dice : 0.935651 mean_hd95 : 4.634082
+Testing Finished!
+mIoU: 0.8870856003217029
