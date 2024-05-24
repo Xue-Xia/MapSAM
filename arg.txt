@@ -1,4 +1,4 @@
-python train.py --root_path data/dataset_hm/partial_1 --output result/ --warmup --AdamW --n_gpu 1 --batch_size 8 --num_classes 1
+python train.py --root_path data/dataset_hm --output result/ --warmup --AdamW --n_gpu 1 --batch_size 8 --num_classes 1
 
 python test.py --is_savenii --volume_path data/dataset_hm --output_dir result/ --num_classes 1 --lora_ckpt checkpoints/epoch_159.pth
 
@@ -25,13 +25,17 @@ Dora 10shot
 Testing performance in best val model: mean_dice : 0.833716 mean_hd95 : 43.243969 rank4
 Testing performance in best val model: mean_dice : 0.789056 mean_hd95 : 27.384993 rank2
 Testing performance in best val model: mean_dice : 0.774790 mean_hd95 : 26.943708 r4 + points
+Testing performance in best val model: mean_dice : 0.871670 mean_hd95 : 14.439612 single class
 mIoU: 0.7342937329833412 rank4
 mIoU: 0.6903321110501123 rank2
 mIoU: 0.6582634030893979 r4 + points
+mIoU: 0.78499312422676   single class
 
 Dora partial1
 Testing performance in best val model: mean_dice : 0.890210 mean_hd95 : 6.175205
+Testing performance in best val model: mean_dice : 0.919842 mean_hd95 : 9.016571 single class
 mIoU: 0.8209048208099076
+mIoU: 0.8651764807737851 single class
 
 Dora partial10
 Testing performance in best val model: mean_dice : 0.930656 mean_hd95 : 5.517115
@@ -41,6 +45,7 @@ Testing performance in best val model: mean_dice : 0.901648 mean_hd95 : 27.04791
 Testing performance in best val model: mean_dice : 0.918618 mean_hd95 : 16.926396 top2points + target embedding + multifeature
 Testing performance in best val model: mean_dice : 0.922921 mean_hd95 : 16.418139 top2points + target embedding + multifeature + masked attention
 Testing performance in best val model: mean_dice : 0.912744 mean_hd95 : 20.695663 top2points + multifeature + masked attention
+Testing performance in best val model: mean_dice : 0.935651 mean_hd95 : 4.634082  single class
 mIoU: 0.8790127021174379
 mIoU: 0.8334575356362215 top2points
 mIoU: 0.8230953211541069 top1point
@@ -48,8 +53,11 @@ mIoU: 0.8346583917883578 top2points + target embedding
 mIoU: 0.8608989279547717 top2points + target embedding + multifeature
 mIoU: 0.8666055690137558 top2points + target embedding + multifeature + masked attention
 mIoU: 0.8524799091466213 top2points + multifeature + masked attention
+mIoU: 0.8870856003217029 single class
 
 Dora full
 Testing performance in best val model: mean_dice : 0.914231 mean_hd95 : 17.173892
+Testing performance in best val model: mean_dice : 0.940611 mean_hd95 : 3.127266  single class
 mIoU: 0.8543722326558837
+mIoU: 0.8946219553011197 single class
 
