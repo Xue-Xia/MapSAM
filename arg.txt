@@ -74,3 +74,14 @@ mIoU: 0.78499312422676
 Dora full
 Testing performance in best val model: mean_dice : 0.940611 mean_hd95 : 3.127266  
 mIoU: 0.8946219553011197
+
+Multi-scale test partial1:
+w/o multi-sacle
+Testing performance in best val model: mean_dice : 0.905658 mean_hd95 : 10.296687
+mIoU: 0.840990613118588
+w multi-sacale (every depth 4, + 3 x SPGen)
+Testing performance in best val model: mean_dice : 0.918706 mean_hd95 : 7.366791
+mIoU: 0.8613840923846205
+w multi-sacale (every depth 2, + 6 x SPGen)
+Testing performance in best val model: mean_dice : 0.911279 mean_hd95 : 8.284748
+mIoU: 0.848367182374158
