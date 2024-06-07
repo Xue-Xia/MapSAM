@@ -1,6 +1,7 @@
 import os
 import numpy as np
 import SimpleITK as sitk
+import argparse
 
 def read_nifti(file_path):
     image = sitk.ReadImage(file_path)
@@ -36,44 +37,28 @@ def calculate_iou_per_class(pred_mask, gt_mask, num_classes):
         iou_per_class.append(iou)
     return iou_per_class
 
+def main(folder_path):
+    files = os.listdir(folder_path)
+    iou_values = []
+    for file_name in files:
+        if file_name.endswith("_gt.nii.gz"):
+            gt_file_path = os.path.join(folder_path, file_name)
+            pred_file_path = os.path.join(folder_path, file_name.replace("_gt.nii.gz", "_pred.nii.gz"))
 
-folder_path = "result/predictions"
-files = os.listdir(folder_path)
-# num_classes = 3
-# total_iou_per_class = [0] * num_classes
-# count_per_class = [0] * num_classes
+            # Read the NIfTI files
+            gt_mask = read_nifti(gt_file_path)
+            pred_mask = read_nifti(pred_file_path)
 
+            # Calculate IoU for this pair of masks
+            iou = calculate_iou(gt_mask, pred_mask)
+            iou_values.append(iou)
 
-iou_values = []
-for file_name in files:
-    if file_name.endswith("_gt.nii.gz"):
-        gt_file_path = os.path.join(folder_path, file_name)
-        pred_file_path = os.path.join(folder_path, file_name.replace("_gt.nii.gz", "_pred.nii.gz"))
+    # Calculate average IoU
+    avg_iou = np.mean(iou_values)
+    print("mIoU:", avg_iou)
 
-        # Read the NIfTI files
-        gt_mask = read_nifti(gt_file_path)
-        pred_mask = read_nifti(pred_file_path)
-
-        # Calculate IoU for this pair of masks
-        iou = calculate_iou(gt_mask, pred_mask)
-        iou_values.append(iou)
-
-# Calculate average IoU
-avg_iou = np.mean(iou_values)
-print("mIoU:", avg_iou)
-
-#         # Compute IoU per class
-#         iou_per_class = calculate_iou_per_class(pred_mask, gt_mask, num_classes)
-#
-#         # Update total IoU and count for each class where it appears
-#         for class_id in range(num_classes):
-#             if iou_per_class[class_id] > 0:
-#                 total_iou_per_class[class_id] += iou_per_class[class_id]
-#                 count_per_class[class_id] += 1
-#
-# # Calculate mean IoU (mIoU) for each class
-# miou_per_class = [total_iou_per_class[i] / count_per_class[i] if count_per_class[i] > 0 else 0 for i in
-#                   range(num_classes)]
-#
-# print(total_iou_per_class, count_per_class)
-# print("mIoU per class:", miou_per_class)
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description='Calculate the mean IoU for predictions.')
+    parser.add_argument('folder_path', type=str, help='Path to the folder containing prediction and ground truth NIfTI files.')
+    args = parser.parse_args()
+    main(args.folder_path)
