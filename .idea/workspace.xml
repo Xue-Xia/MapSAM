@@ -1,10 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="ebc476e0-d251-4946-b9bf-f5cb37355c0c" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/inspectionProfiles/Project_Default.xml" beforeDir="false" />
+    <list default="true" id="b7f31a56-6ba4-45b8-bfd8-41b0b29abb9c" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/arg.txt" beforeDir="false" afterPath="$PROJECT_DIR$/arg.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/datasets/dataset_hm.py" beforeDir="false" afterPath="$PROJECT_DIR$/datasets/dataset_hm.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/eval.py" beforeDir="false" afterPath="$PROJECT_DIR$/eval.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/segment_anything/modeling/sam.py" beforeDir="false" afterPath="$PROJECT_DIR$/segment_anything/modeling/sam.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/test.py" beforeDir="false" afterPath="$PROJECT_DIR$/test.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/trainer.py" beforeDir="false" afterPath="$PROJECT_DIR$/trainer.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/utils_hm.py" beforeDir="false" afterPath="$PROJECT_DIR$/utils_hm.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -17,19 +22,19 @@
   <component name="MarkdownSettingsMigration">
     <option name="stateVersion" value="1" />
   </component>
-  <component name="ProjectId" id="2gpe1gb05m2hyxfvvPFTw6G4D8s" />
+  <component name="ProjectId" id="2hMsGEVxGVWRH6UElWb264nZ5gh" />
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "RunOnceActivity.OpenProjectViewOnStart": "true",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "last_opened_file_path": "/local/home/xiaxue/Downloads/MapSAM/test.py"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;last_opened_file_path&quot;: &quot;/local/home/xiaxue/Downloads/MapSAM/train.py&quot;
   }
-}]]></component>
-  <component name="RunManager" selected="Python.eval">
+}</component>
+  <component name="RunManager" selected="Python.test">
     <configuration name="eval" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
       <module name="MapSAM" />
       <option name="INTERPRETER_OPTIONS" value="" />
@@ -64,7 +69,7 @@
       <option name="ADD_CONTENT_ROOTS" value="true" />
       <option name="ADD_SOURCE_ROOTS" value="true" />
       <option name="SCRIPT_NAME" value="$PROJECT_DIR$/test.py" />
-      <option name="PARAMETERS" value="--is_savenii --volume_path data/dataset_hm --output_dir result/ --num_classes 1 --lora_ckpt checkpoints/epoch_159.pth" />
+      <option name="PARAMETERS" value="--is_savenii --volume_path data/dataset_vine --output_dir result/ --num_classes 1 --lora_ckpt checkpoints/epoch_159.pth" />
       <option name="SHOW_COMMAND_LINE" value="false" />
       <option name="EMULATE_TERMINAL" value="false" />
       <option name="MODULE_MODE" value="false" />
@@ -85,7 +90,7 @@
       <option name="ADD_CONTENT_ROOTS" value="true" />
       <option name="ADD_SOURCE_ROOTS" value="true" />
       <option name="SCRIPT_NAME" value="$PROJECT_DIR$/train.py" />
-      <option name="PARAMETERS" value="--root_path data/dataset_hm --output result/ --warmup --AdamW --n_gpu 1 --batch_size 8 --num_classes 1" />
+      <option name="PARAMETERS" value="--root_path data/dataset_vine --output result/ --warmup --AdamW --n_gpu 1 --batch_size 8 --num_classes 1" />
       <option name="SHOW_COMMAND_LINE" value="false" />
       <option name="EMULATE_TERMINAL" value="false" />
       <option name="MODULE_MODE" value="false" />
@@ -94,8 +99,8 @@
       <method v="2" />
     </configuration>
     <list>
-      <item itemvalue="Python.train" />
       <item itemvalue="Python.test" />
+      <item itemvalue="Python.train" />
       <item itemvalue="Python.eval" />
     </list>
     <recent_temporary>
@@ -107,11 +112,11 @@
   <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
   <component name="TaskManager">
     <task active="true" id="Default" summary="Default task">
-      <changelist id="ebc476e0-d251-4946-b9bf-f5cb37355c0c" name="Changes" comment="" />
-      <created>1716398732554</created>
+      <changelist id="b7f31a56-6ba4-45b8-bfd8-41b0b29abb9c" name="Changes" comment="" />
+      <created>1717415182601</created>
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
-      <updated>1716398732554</updated>
+      <updated>1717415182601</updated>
     </task>
     <servers />
   </component>

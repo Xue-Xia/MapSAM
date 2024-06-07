@@ -80,5 +80,5 @@ class hm_dataset(Dataset):
         sample = {'image': image, 'label': label}
         if self.transform:
             sample = self.transform(sample)
-        sample['case_name'] = self.file_names[idx][:-8]
+        sample['case_name'] = self.file_names[idx][:-4]
         return sample

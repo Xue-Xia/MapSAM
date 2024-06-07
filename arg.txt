@@ -61,3 +61,19 @@ Testing performance in best val model: mean_dice : 0.940611 mean_hd95 : 3.127266
 mIoU: 0.8543722326558837
 mIoU: 0.8946219553011197 single class
 
+
+vineyards
+Testing performance in best val model: mean_dice : 0.761925 mean_hd95 : 9.412331 08
+mIoU: 0.4121806436536658
+Testing performance in best val model: mean_dice : 0.575028 mean_hd95 : 9.435499 02
+mIoU: 0.5968088829528647
+Testing performance in best val model: mean_dice : 0.669026 mean_hd95 : 14.946075 517 02
+Testing performance in best val model: mean_dice : 0.775399 mean_hd95 : 14.619025 517 08
+
+Testing performance in best val model: mean_dice : 0.307565 mean_hd95 : 8.254235 samed
+Testing performance in best val model: mean_dice : 0.925813 mean_hd95 : 10.765671 mapsam focal+dice+focal
+
+Testing performance in best val model: p : 0.837549 r : 0.825204 f1 : 0.823650 iou : 0.732998 mapsam top2points
+Testing performance in best val model: p : 0.834250 r : 0.831982 f1 : 0.823856 iou : 0.730962 mapsam top1points
+Testing performance in best val model: p : 0.830144 r : 0.824888 f1 : 0.818479 iou : 0.721428 mapsam Nopoints
+Testing performance in best val model: p : 0.859837 r : 0.816921 f1 : 0.831644 iou : 0.744370 samed

@@ -10,6 +10,14 @@ def read_nifti(file_path):
 def calculate_iou(pred_mask, gt_mask):
     intersection = np.logical_and(pred_mask, gt_mask)
     union = np.logical_or(pred_mask, gt_mask)
+    # Handle the case where the union is empty
+    if np.sum(union) == 0:
+        # If both masks are empty, return IoU of 1
+        if np.sum(pred_mask) == 0 and np.sum(gt_mask) == 0:
+            return 1.0
+        # If only one is empty, return IoU of 0
+        else:
+            return 0.0
     iou = np.sum(intersection) / np.sum(union)
     return iou
 

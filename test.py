@@ -33,17 +33,19 @@ def inference(args, multimask_output, db_config, model, test_save_path=None):
                                       patch_size=[args.img_size, args.img_size], input_size=[args.input_size, args.input_size],
                                       test_save_path=test_save_path, case=case_name, z_spacing=db_config['z_spacing'])
         metric_list += np.array(metric_i)
-        logging.info('idx %d case %s mean_dice %f mean_hd95 %f' % (
-            i_batch, case_name, np.mean(metric_i, axis=0)[0], np.mean(metric_i, axis=0)[1]))
+        logging.info('idx %d case %s p %f r %f f1 %f iou %f' % (
+            i_batch, case_name, np.mean(metric_i, axis=0)[0], np.mean(metric_i, axis=0)[1], np.mean(metric_i, axis=0)[2], np.mean(metric_i, axis=0)[3]))
     metric_list = metric_list / len(db_test)
     for i in range(1, args.num_classes + 1):
         try:
-            logging.info('Mean class %d name %s mean_dice %f mean_hd95 %f' % (i, class_to_name[i], metric_list[i - 1][0], metric_list[i - 1][1]))
+            logging.info('Mean class %d name %s p %f r %f f1 %f iou %f' % (i, class_to_name[i], metric_list[i - 1][0], metric_list[i - 1][1], metric_list[i - 1][2], metric_list[i - 1][3]))
         except:
-            logging.info('Mean class %d mean_dice %f mean_hd95 %f' % (i, metric_list[i - 1][0], metric_list[i - 1][1]))
-    performance = np.mean(metric_list, axis=0)[0]
-    mean_hd95 = np.mean(metric_list, axis=0)[1]
-    logging.info('Testing performance in best val model: mean_dice : %f mean_hd95 : %f' % (performance, mean_hd95))
+            logging.info('Mean class %d p %f r %f f1 %f iou %f' % (i, metric_list[i - 1][0], metric_list[i - 1][1], metric_list[i - 1][2], metric_list[i - 1][3]))
+    p = np.mean(metric_list, axis=0)[0]
+    r = np.mean(metric_list, axis=0)[1]
+    f1 = np.mean(metric_list, axis=0)[2]
+    iou = np.mean(metric_list, axis=0)[3]
+    logging.info('Testing performance in best val model: p : %f r : %f f1 : %f iou : %f' % (p, r, f1, iou))
     logging.info("Testing Finished!")
     return 1
 

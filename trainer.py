@@ -106,7 +106,7 @@ def trainer_synapse(args, model, snapshot_path, multimask_output, low_res):
     model.train()
     # ce_loss = CrossEntropyLoss()
     # dice_loss = DiceLoss(num_classes+1)
-    # bce_loss = nn.BCELoss()
+    bce_loss = nn.BCELoss()
 
     if args.warmup:
         b_lr = base_lr / args.warmup_period
@@ -141,7 +141,6 @@ def trainer_synapse(args, model, snapshot_path, multimask_output, low_res):
 
             loss_focal = focal_loss(input, target)
             loss_dice = dice_loss(input, target)
-
             loss_focal_hint = focal_loss(coarse_mask, target)
             loss_dice_hint = dice_loss(coarse_mask, target)
 
@@ -184,7 +183,7 @@ def trainer_synapse(args, model, snapshot_path, multimask_output, low_res):
                 labs = label_batch[1, ...].unsqueeze(0) * 50
                 writer.add_image('train/GroundTruth', labs, iter_num)
 
-        save_interval = 20 # int(max_epoch/6)
+        save_interval = 80 # int(max_epoch/6)
         if (epoch_num + 1) % save_interval == 0:
             save_mode_path = os.path.join(snapshot_path, 'epoch_' + str(epoch_num) + '.pth')
             try:

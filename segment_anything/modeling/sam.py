@@ -1,10 +1,11 @@
 # Copyright (c) Meta Platforms, Inc. and affiliates.
 # All rights reserved.
-
+import cv2
 # This source code is licensed under the license found in the
 # LICENSE file in the root directory of this source tree.
 
 import torch
+from matplotlib import pyplot as plt
 from torch import nn
 from torch.nn import functional as F
 from icecream import ic
@@ -131,10 +132,34 @@ class Sam(nn.Module):
             attn_mask = attn_mask.detach()
 
             # Positive-negative location prior
-            topk_xy_i, topk_label_i, last_xy_i, last_label_i = point_selection(coarse_mask_up16[idx].squeeze(0), topk=2)
+            topk_xy_i, topk_label_i, last_xy_i, last_label_i = point_selection(coarse_mask_up16[idx].squeeze(0), topk=1)
             topk_xy = torch.cat([topk_xy_i, last_xy_i], dim=0)
             topk_label = torch.cat([topk_label_i, last_label_i], dim=0)
             fg_points = (topk_xy.unsqueeze(0), topk_label.unsqueeze(0))
+
+            '''# plot the results
+            image = input_images[idx].permute(1,2,0).cpu().numpy()
+            image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+            mask = coarse_mask_up16[idx].permute(1,2,0).detach().cpu().numpy()
+            points = topk_xy.cpu().numpy()
+            print(points)
+            
+            fig, ax = plt.subplots(1, 2, figsize=(10, 10))
+            ax[0].set_title('Input Image')
+            ax[0].imshow(image)
+
+            ax[1].set_title('Coarse Mask')
+            ax[1].imshow(mask, cmap='gray')
+            ax[1].plot(points[0][0], points[0][1], 'g.')
+            ax[1].plot(points[-1][0], points[-1][1], 'r.')
+            # for point in points:
+            #     ax[1].plot(point[1], point[0], 'r.')
+            [axi.set_axis_off() for axi in ax.ravel()]
+            # Save the plot to a file
+            output_filename = 'figures/plotted_images.png'
+            plt.savefig(output_filename)
+            # Optionally display the plot
+            # plt.show()'''
 
             #get target semantic
             image_feat = image_embeddings[idx].permute(1, 2, 0).detach()

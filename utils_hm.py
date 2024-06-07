@@ -112,6 +112,24 @@ def calculate_metric_percase(pred, gt):
     else:
         return 0, 0
 
+def calculate_metric(pred_array, gt_array):
+    # Flatten arrays
+    gt_array = gt_array.flatten()
+    pred_array = pred_array.flatten()
+
+    # Calculate True Positive (TP), False Positive (FP), False Negative (FN)
+    tp = np.sum((gt_array == 1) & (pred_array == 1))
+    fp = np.sum((gt_array == 0) & (pred_array == 1))
+    fn = np.sum((gt_array == 1) & (pred_array == 0))
+    tn = np.sum((gt_array == 0) & (pred_array == 0))  # True Negative (TN), for completeness
+
+    # Calculate precision, recall, F1 score, IoU
+    p = tp / (tp + fp) if (tp + fp) > 0 else 0
+    r = tp / (tp + fn) if (tp + fn) > 0 else 0
+    f1 = 2 * (p * r) / (p + r) if (p + r) > 0 else 0
+    iou = tp / (tp + fp + fn) if (tp + fp + fn) > 0 else 0
+
+    return p, r, f1, iou
 
 def test_single_volume(image, label, net, classes, multimask_output, patch_size=[256, 256], input_size=[224, 224],
                        test_save_path=None, case=None, z_spacing=1):
@@ -165,19 +183,9 @@ def test_single_volume(image, label, net, classes, multimask_output, patch_size=
                 prediction = zoom(prediction, (x / patch_size[0], y / patch_size[1]), order=0)
     metric_list = []
     for i in range(1, classes + 1):
-        metric_list.append(calculate_metric_percase(prediction == i, label == i))
+        metric_list.append(calculate_metric(prediction, label))
 
     if test_save_path is not None:
-        img_itk = sitk.GetImageFromArray(image.astype(np.float32))
-        prd_itk = sitk.GetImageFromArray(prediction.astype(np.float32))
-        lab_itk = sitk.GetImageFromArray(label.astype(np.float32))
-        img_itk.SetSpacing((1, 1, z_spacing))
-        prd_itk.SetSpacing((1, 1, z_spacing))
-        lab_itk.SetSpacing((1, 1, z_spacing))
-        sitk.WriteImage(prd_itk, test_save_path + '/' + case + "_pred.nii.gz")
-        sitk.WriteImage(img_itk, test_save_path + '/' + case + "_img.nii.gz")
-        sitk.WriteImage(lab_itk, test_save_path + '/' + case + "_gt.nii.gz")
-
         prediction_uint8 = (prediction * 255).astype(np.uint8)
         label_uint8 = (label * 255).astype(np.uint8)
         cv2.imwrite(test_save_path + '/' + case + "_pred.png", prediction_uint8)
