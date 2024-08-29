@@ -10,13 +10,10 @@ import torch
 import torch.nn as nn
 import torch.optim as optim
 from tensorboardX import SummaryWriter
-from torch.nn.modules.loss import CrossEntropyLoss
 from torch.utils.data import DataLoader
 import torch.nn.functional as F
 from tqdm import tqdm
-from utils import DiceLoss, Focal_loss
 from torchvision import transforms
-from icecream import ic
 
 def dice_loss(logits, target, smooth=1e-6):
     # Convert logits to probabilities using sigmoid
@@ -70,18 +67,8 @@ def focal_loss(inputs, targets, alpha=0.25, gamma=2):
 
     return loss.mean(1).mean()
 
-def calc_loss(outputs, coarse_mask, low_res_label_batch, ce_loss, dice_loss, bce_loss, dice_weight:float=0.8):
-    low_res_logits = outputs['low_res_logits']
-    loss_ce = ce_loss(low_res_logits, low_res_label_batch[:].long())
-    loss_dice = dice_loss(low_res_logits, low_res_label_batch, softmax=True)
 
-    loss_hint = bce_loss(torch.sigmoid(coarse_mask), low_res_label_batch.unsqueeze(1).float())
-
-    loss = (1 - dice_weight) * loss_ce + dice_weight * loss_dice + loss_hint
-    return loss, loss_ce, loss_dice, loss_hint
-
-
-def trainer_synapse(args, model, snapshot_path, multimask_output, low_res):
+def trainer_hm(args, model, snapshot_path, multimask_output, low_res):
     from datasets.dataset_hm import hm_dataset, RandomGenerator
     logging.basicConfig(filename=snapshot_path + "/log.txt", level=logging.INFO,
                         format='[%(asctime)s.%(msecs)03d] %(message)s', datefmt='%H:%M:%S')
@@ -91,7 +78,7 @@ def trainer_synapse(args, model, snapshot_path, multimask_output, low_res):
     num_classes = args.num_classes
     batch_size = args.batch_size * args.n_gpu
     # max_iterations = args.max_iterations
-    db_train = hm_dataset(base_dir=args.root_path, list_dir=args.list_dir, split="train",
+    db_train = hm_dataset(base_dir=args.root_path, split="train",
                                transform=transforms.Compose(
                                    [RandomGenerator(output_size=[args.img_size, args.img_size], low_res=[low_res, low_res])]))
     print("The length of train set is: {}".format(len(db_train)))
@@ -104,9 +91,6 @@ def trainer_synapse(args, model, snapshot_path, multimask_output, low_res):
     if args.n_gpu > 1:
         model = nn.DataParallel(model)
     model.train()
-    # ce_loss = CrossEntropyLoss()
-    # dice_loss = DiceLoss(num_classes+1)
-    bce_loss = nn.BCELoss()
 
     if args.warmup:
         b_lr = base_lr / args.warmup_period
@@ -132,7 +116,6 @@ def trainer_synapse(args, model, snapshot_path, multimask_output, low_res):
             low_res_label_batch = low_res_label_batch.cuda()
             assert image_batch.max() <= 3, f'image_batch max: {image_batch.max()}'
             outputs, coarse_mask = model(image_batch, multimask_output, args.img_size)
-            # loss, loss_ce, loss_dice,loss_hint = calc_loss(outputs, coarse_mask, low_res_label_batch, ce_loss, dice_loss, bce_loss, args.dice_param)
 
             dice_weight = args.dice_param
 
@@ -187,17 +170,17 @@ def trainer_synapse(args, model, snapshot_path, multimask_output, low_res):
         if (epoch_num + 1) % save_interval == 0:
             save_mode_path = os.path.join(snapshot_path, 'epoch_' + str(epoch_num) + '.pth')
             try:
-                model.save_lora_parameters(save_mode_path)
+                model.save_dora_parameters(save_mode_path)
             except:
-                model.module.save_lora_parameters(save_mode_path)
+                model.module.save_dora_parameters(save_mode_path)
             logging.info("save model to {}".format(save_mode_path))
 
         if epoch_num >= max_epoch - 1 or epoch_num >= stop_epoch - 1:
             save_mode_path = os.path.join(snapshot_path, 'epoch_' + str(epoch_num) + '.pth')
             try:
-                model.save_lora_parameters(save_mode_path)
+                model.save_dora_parameters(save_mode_path)
             except:
-                model.module.save_lora_parameters(save_mode_path)
+                model.module.save_dora_parameters(save_mode_path)
             logging.info("save model to {}".format(save_mode_path))
             iterator.close()
             break

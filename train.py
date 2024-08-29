@@ -8,22 +8,19 @@ import torch.backends.cudnn as cudnn
 
 from importlib import import_module
 
-from sam_lora_image_encoder import LoRA_Sam
+from sam_dora_image_encoder import DoRA_Sam
 from segment_anything import sam_model_registry
 
-from trainer import trainer_synapse
-from icecream import ic
+from trainer import trainer_hm
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--root_path', type=str,
-                    default='/data/LarryXu/Synapse/preprocessed_data/train_npz', help='root dir for data')
+                    default='/data/dataset_rail', help='root dir for data')
 parser.add_argument('--output', type=str, default='/output/sam/results')
 parser.add_argument('--dataset', type=str,
-                    default='Synapse', help='experiment_name')
-parser.add_argument('--list_dir', type=str,
-                    default='./lists/lists_Synapse', help='list dir')
+                    default='Siegfried', help='experiment_name')
 parser.add_argument('--num_classes', type=int,
-                    default=3, help='output channel of network')
+                    default=1, help='output channel of network')
 parser.add_argument('--max_iterations', type=int,
                     default=30000, help='maximum epoch number to train')
 parser.add_argument('--max_epochs', type=int,
@@ -45,7 +42,7 @@ parser.add_argument('--vit_name', type=str,
                     default='vit_b', help='select one vit model')
 parser.add_argument('--ckpt', type=str, default='checkpoints/sam_vit_b_01ec64.pth',
                     help='Pretrained checkpoint')
-parser.add_argument('--lora_ckpt', type=str, default=None, help='Finetuned lora checkpoint')
+parser.add_argument('--dora_ckpt', type=str, default=None, help='Finetuned dora checkpoint')
 parser.add_argument('--rank', type=int, default=4, help='Rank for LoRA adaptation')
 parser.add_argument('--warmup', action='store_true', help='If activated, warp up the learning from a lower lr to the base_lr')
 parser.add_argument('--warmup_period', type=int, default=250,
@@ -69,9 +66,8 @@ if __name__ == "__main__":
     torch.cuda.manual_seed(args.seed)
     dataset_name = args.dataset
     dataset_config = {
-        'Synapse': {
+        'Siegfried': {
             'root_path': args.root_path,
-            'list_dir': args.list_dir,
             'num_classes': args.num_classes,
         }
     }
@@ -97,11 +93,10 @@ if __name__ == "__main__":
                                                                 pixel_std=[1, 1, 1])
 
     pkg = import_module(args.module)
-    net = pkg.LoRA_Sam(sam, args.rank).cuda()
+    net = pkg.DoRA_Sam(sam, args.rank).cuda()
 
-    # net = LoRA_Sam(sam, args.rank).cuda()
-    if args.lora_ckpt is not None:
-        net.load_lora_parameters(args.lora_ckpt)
+    if args.dora_ckpt is not None:
+        net.load_dora_parameters(args.dora_ckpt)
 
     if args.num_classes > 1:
         multimask_output = True
@@ -118,5 +113,5 @@ if __name__ == "__main__":
     with open(config_file, 'w') as f:
         f.writelines(config_items)
 
-    trainer = {'Synapse': trainer_synapse}
+    trainer = {'Siegfried': trainer_hm}
     trainer[dataset_name](args, net, snapshot_path, multimask_output, low_res)

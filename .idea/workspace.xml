@@ -2,13 +2,61 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="b7f31a56-6ba4-45b8-bfd8-41b0b29abb9c" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/arg.txt" beforeDir="false" afterPath="$PROJECT_DIR$/arg.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/LICENSE" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/SAMed_h/README.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/SAMed_h/datasets/__init__.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/SAMed_h/datasets/dataset_synapse.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/SAMed_h/lists/lists_Synapse/all.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/SAMed_h/lists/lists_Synapse/test_vol.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/SAMed_h/lists/lists_Synapse/train.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/SAMed_h/requirements.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/SAMed_h/sam_lora_image_encoder.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/SAMed_h/segment_anything/__init__.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/SAMed_h/segment_anything/automatic_mask_generator.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/SAMed_h/segment_anything/build_sam.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/SAMed_h/segment_anything/modeling/__init__.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/SAMed_h/segment_anything/modeling/common.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/SAMed_h/segment_anything/modeling/image_encoder.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/SAMed_h/segment_anything/modeling/mask_decoder.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/SAMed_h/segment_anything/modeling/prompt_encoder.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/SAMed_h/segment_anything/modeling/sam.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/SAMed_h/segment_anything/modeling/transformer.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/SAMed_h/segment_anything/predictor.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/SAMed_h/segment_anything/utils/__init__.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/SAMed_h/segment_anything/utils/amg.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/SAMed_h/segment_anything/utils/onnx.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/SAMed_h/segment_anything/utils/transforms.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/SAMed_h/test.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/SAMed_h/train.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/SAMed_h/trainer.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/SAMed_h/utils.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/arg.txt" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/datasets/dataset_hm.py" beforeDir="false" afterPath="$PROJECT_DIR$/datasets/dataset_hm.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/eval.py" beforeDir="false" afterPath="$PROJECT_DIR$/eval.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/datasets/dataset_synapse.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/eval.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/figures/plotted_images.png" beforeDir="false" afterPath="$PROJECT_DIR$/figures/plotted_images.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lists/lists_Synapse/all.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/lists/lists_Synapse/test_vol.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/lists/lists_Synapse/train.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/materials/pipeline.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/materials/teaser.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/preprocess/README.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/preprocess/preprocess_data.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/preprocess/preprocess_hm.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/requirements.txt" beforeDir="false" afterPath="$PROJECT_DIR$/requirements.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/sam_dora_image_encoder.py" beforeDir="false" afterPath="$PROJECT_DIR$/sam_dora_image_encoder.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/sam_lora_image_encoder.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/sam_lora_image_encoder_mask_decoder.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/segment_anything/modeling/image_encoder.py" beforeDir="false" afterPath="$PROJECT_DIR$/segment_anything/modeling/image_encoder.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/segment_anything/modeling/sam.py" beforeDir="false" afterPath="$PROJECT_DIR$/segment_anything/modeling/sam.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/subsample_datasets.py" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/test.py" beforeDir="false" afterPath="$PROJECT_DIR$/test.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/train.py" beforeDir="false" afterPath="$PROJECT_DIR$/train.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/trainer.py" beforeDir="false" afterPath="$PROJECT_DIR$/trainer.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/utils.py" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/utils_hm.py" beforeDir="false" afterPath="$PROJECT_DIR$/utils_hm.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -69,7 +117,7 @@
       <option name="ADD_CONTENT_ROOTS" value="true" />
       <option name="ADD_SOURCE_ROOTS" value="true" />
       <option name="SCRIPT_NAME" value="$PROJECT_DIR$/test.py" />
-      <option name="PARAMETERS" value="--is_savenii --volume_path data/dataset_vine --output_dir result/ --num_classes 1 --lora_ckpt checkpoints/epoch_159.pth" />
+      <option name="PARAMETERS" value="--root_path data/dataset_rail --output_dir result/ --dora_ckpt checkpoints/epoch_9.pth" />
       <option name="SHOW_COMMAND_LINE" value="false" />
       <option name="EMULATE_TERMINAL" value="false" />
       <option name="MODULE_MODE" value="false" />
@@ -90,7 +138,7 @@
       <option name="ADD_CONTENT_ROOTS" value="true" />
       <option name="ADD_SOURCE_ROOTS" value="true" />
       <option name="SCRIPT_NAME" value="$PROJECT_DIR$/train.py" />
-      <option name="PARAMETERS" value="--root_path data/dataset_vine --output result/ --warmup --AdamW --n_gpu 1 --batch_size 8 --num_classes 1" />
+      <option name="PARAMETERS" value="--root_path data/dataset_rail/fewshot10 --output result/ --warmup --AdamW --n_gpu 1 --batch_size 8 --stop_epoch 10" />
       <option name="SHOW_COMMAND_LINE" value="false" />
       <option name="EMULATE_TERMINAL" value="false" />
       <option name="MODULE_MODE" value="false" />

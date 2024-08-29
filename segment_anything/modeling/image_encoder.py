@@ -112,7 +112,7 @@ class ImageEncoderViT(nn.Module):
         states = []
         for i,blk in enumerate(self.blocks):
             x = blk(x)
-            if i % 4 == 0 and i != len(self.blocks) - 1:  #store states every 3 depth
+            if i%4 == 0 and (i+1) != len(self.blocks):  #store states every 4 depth
                 states.append(self.neck(x.permute(0, 3, 1, 2)))
         x = self.neck(x.permute(0, 3, 1, 2))  # [b, c, h, w], [1, 256, 64, 64]
 

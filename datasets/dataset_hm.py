@@ -58,10 +58,9 @@ class RandomGenerator(object):
 
 
 class hm_dataset(Dataset):
-    def __init__(self, base_dir, list_dir, split, transform=None):
+    def __init__(self, base_dir, split, transform=None):
         self.transform = transform  # using transform in torch!
         self.split = split
-        # self.sample_list = open(os.path.join(list_dir, self.split+'.txt')).readlines()
         self.img_dir = os.path.join(base_dir, split)
         self.label_dir = os.path.join(base_dir, 'annotation', split)
         self.file_names = os.listdir(os.path.join(base_dir, split))
