@@ -10,7 +10,7 @@ We propose MapSAM, a parameter-efficient fine-tuning strategy that adapts SAM in
 
 ## Installation
 ```
-conda create -n MapSAM python=3.7
+conda create -n MapSAM python=3.8
 conda activate MapSAM
 # install pytorch, the version is 1.9.1
 pip install torch==1.9.1+cu111 torchvision==0.10.1+cu111 torchaudio==0.9.1 -f https://download.pytorch.org/whl/torch_stable.html
