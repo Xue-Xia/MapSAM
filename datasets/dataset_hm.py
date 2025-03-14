@@ -8,7 +8,6 @@ from scipy import ndimage
 from scipy.ndimage.interpolation import zoom
 from torch.utils.data import Dataset
 from einops import repeat
-from icecream import ic
 
 
 def random_rot_flip(image, label):
