@@ -22,7 +22,7 @@ pip install -r requirements.txt
 **Here are the instructions:**
 1. Please download the pretrained [SAM model](https://drive.google.com/file/d/1_oCdoEEu3mNhRfFxeWyRerOKt8OEUvcg/view?usp=share_link) and Put it in the `./checkpoints` folder.
 2. Please download the [Siegfried_Railway_Vineyard dataset](https://doi.org/10.3929/ethz-b-000691430) or use your own dataset.
-3. Run te following command to test the performance of MapSAM.
+3. Run the following command to test the performance of MapSAM.
 
 **Training**
 ```bash
