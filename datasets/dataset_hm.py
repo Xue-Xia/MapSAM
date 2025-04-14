@@ -17,9 +17,7 @@ def random_rot_flip(image, label):
 
     axis = np.random.randint(1, 3)
     image = np.flip(image, axis=axis).copy()
-
-    axis = np.random.randint(0, 2)
-    label = np.flip(label, axis=axis).copy()
+    label = np.flip(label, axis=axis-1).copy()
 
     return image, label
 
